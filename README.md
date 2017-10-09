@@ -4,14 +4,14 @@ Implementing multi models for Text Classification in TensorFlow.
 ## Contents
 ### Data and Preprocess
 #### Data
-Models are used to perform sentiment analysis on movie reviews from the [Large Movie Review Dataset](http://ai.stanford.edu/~amaas/data/sentiment/), which has a set of 25,000 highly polar movie reviews for training, and 25,000 for testing.<br/>
+Models are used to perform sentiment analysis on movie reviews from the [Movie Review data from Rotten Tomatoes](http://www.cs.cornell.edu/people/pabo/movie-review-data/), which contains 10,662 example review sentences, half positive and half negative.<br/>
 In this task, given a movie review, the model attempts to predict whether it is positive or negative. This is a binary classification task.
 
 #### Preprocess
 1. Load positive and negative sentences from the raw data files.
 2. Clean the text data.
 3. Pad each sentence to the maximum sentence length. We append special <PAD> tokens to all other sentences to make them 59 words. Padding sentences to the same length is useful because it allows us to efficiently batch our data since each example in a batch must be of the same length.
-4. Wordvector mapping, Each sentence becomes a bag of word vectors.
+4. Word vector mapping, Each sentence becomes a bag of word vectors.
 
 ### Models
 #### FastText
