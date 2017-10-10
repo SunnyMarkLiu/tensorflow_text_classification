@@ -58,8 +58,8 @@ vocab_processor = learn.preprocessing.VocabularyProcessor(max_document_length=ma
 # Maps documents to sequences of word ids in vocabulary
 x = np.array(list(vocab_processor.fit_transform(x_text)))
 
-vocabulary = vocab_processor.vocabulary_
-print('built vocabulary size: {:d}'.format(len(vocabulary)))
+vocabulary_size = len(vocab_processor.vocabulary_)
+print('built vocabulary size: {:d}'.format(vocabulary_size))
 # Randomly shuffle data
 np.random.seed(10)
 shuffle_indices = np.random.permutation(np.arange(len(y)))
@@ -80,5 +80,10 @@ with tf.Graph().as_default():
         log_device_placement=False)
     session = tf.Session(session_conf)
     with session.as_default():
-        fast_text = FastText()
+        fast_text = FastText(embedding_dim=embedding_dimension,
+                             sequence_length=max_document_length,
+                             label_size=2,
+                             vocabulary_size=vocabulary_size,
+                             embedding_trainable=False)
+
 
