@@ -15,8 +15,8 @@ In this task, given a movie review, the model attempts to predict whether it is 
 
 ### Models
 #### FastText
-1. word representations: Enriching Word Vectors with Subword Information
-2. text classification: Bag of Tricks for Efficient Text Classification
+1. word representations: [Enriching Word Vectors with Subword Information](https://github.com/SunnyMarkLiu/MachineLearning-DeepLearning-Papers/blob/master/Deep%20Learning/Natural%20Language%20Processing/Word%20Embedding/Enriching%20Word%20Vectors%20with%20Subword%20Information.pdf)
+2. text classification: [Bag of Tricks for Efficient Text Classification](https://github.com/SunnyMarkLiu/MachineLearning-DeepLearning-Papers/blob/master/Deep%20Learning/Natural%20Language%20Processing/Sentence%20classification/Bag%20of%20Tricks%20for%20Efficient%20Text%20Classification.pdf)
 
 ### Results
 | Models     | FastText | right |
