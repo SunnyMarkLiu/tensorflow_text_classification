@@ -14,6 +14,10 @@ module_path = os.path.abspath(os.path.join('..'))
 sys.path.append(module_path)
 
 import numpy as np
+from sklearn.datasets import fetch_20newsgroups
+from sklearn.datasets import load_files
+
+import cPickle
 from conf.configure import Configure
 
 import re
@@ -105,7 +109,58 @@ def load_text_datasets():
     return [x_text, y]
 
 
-def load_embedding_vectors_glove(vocabulary, glove_w2c_filename, vector_size):
+def get_datasets_20newsgroup(subset='train', categories=None, shuffle=True, random_state=42):
+    """
+    Retrieve data from 20 newsgroups
+    :param subset: train, test or all
+    :param categories: List of newsgroup name
+    :param shuffle: shuffle the list or not
+    :param random_state: seed integer to shuffle the dataset
+    :return: data and labels of the newsgroup
+    """
+    if categories is None:
+        categories = ['alt.atheism', 'sci.space']
+    datasets = fetch_20newsgroups(subset=subset, categories=categories, shuffle=shuffle, random_state=random_state)
+    return datasets
+
+
+def get_datasets_localdata(container_path=None, categories=None, load_content=True,
+                           encoding='utf-8', shuffle=True, random_state=42):
+    """
+    Load text files with categories as subfolder names.
+    Individual samples are assumed to be files stored a two levels folder structure.
+    :param container_path: The path of the container
+    :param categories: List of classes to choose, all classes are chosen by default (if empty or omitted)
+    :param shuffle: shuffle the list or not
+    :param random_state: seed integer to shuffle the dataset
+    :return: data and labels of the dataset
+    """
+    datasets = load_files(container_path=container_path, categories=categories,
+                          load_content=load_content, shuffle=shuffle, encoding=encoding,
+                          random_state=random_state)
+    return datasets
+
+
+def load_data_labels(datasets):
+    """
+    Load data and labels
+    :param datasets:
+    :return:
+    """
+    # Split by words
+    x_text = datasets['data']
+    x_text = [TextCleaner.clean_text(sent) for sent in x_text]
+    # Generate labels
+    labels = []
+    for i in range(len(x_text)):
+        label = [0 for j in datasets['target_names']]
+        label[datasets['target'][i]] = 1
+        labels.append(label)
+    y = np.array(labels)
+    return [x_text, y]
+
+
+def load_glove_word_embeddings(vocabulary, glove_w2c_filename, vector_size):
     """
     load embedding_vectors from the pre-trained glove vectors
     :param vocabulary: 
@@ -114,6 +169,11 @@ def load_embedding_vectors_glove(vocabulary, glove_w2c_filename, vector_size):
     :return: [vocabulary_size, embedding_size]
     """
     # initial matrix with random uniform
+    glove_word_embedding_matrix_path = Configure.glove_word_embedding_matrix
+    if os.path.exists(glove_word_embedding_matrix_path):
+        with open(glove_word_embedding_matrix_path, "rb") as f:
+            return cPickle.load(f)
+
     word_embeddings = np.random.uniform(-0.25, 0.25, (len(vocabulary), vector_size))
     f = open(glove_w2c_filename)
     for line in f:
@@ -124,6 +184,10 @@ def load_embedding_vectors_glove(vocabulary, glove_w2c_filename, vector_size):
         if idx != 0:
             word_embeddings[idx] = vector
     f.close()
+
+    with open(glove_word_embedding_matrix_path, "wb") as f:
+        cPickle.dump(word_embeddings, f, -1)
+
     return word_embeddings
 
 
