@@ -90,14 +90,23 @@ class DataWrapper(object):
 
 def load_text_datasets():
     """
-    Loads MR polarity data from files, splits the data into words and generates labels.
+    Loads movie review dataset from files, splits the data into words and generates labels.
     Returns split sentences and labels.
     :return: 
     """
     # Load data from files
-    positive_examples = list(open(Configure.positive_data_file, "r").readlines())
+    positive_examples = []
+    negative_examples = []
+
+    pos_files = os.listdir(Configure.positive_data_dir)
+    for pf in pos_files:
+        positive_examples.append(open(Configure.positive_data_dir + pf, "r").readline())
+
+    neg_files = os.listdir(Configure.negative_data_dir)
+    for nf in neg_files:
+        negative_examples.append(open(Configure.negative_data_dir + nf, "r").readline())
+
     positive_examples = [s.strip() for s in positive_examples]
-    negative_examples = list(open(Configure.negative_data_file, "r").readlines())
     negative_examples = [s.strip() for s in negative_examples]
     # Split by words
     x_text = positive_examples + negative_examples

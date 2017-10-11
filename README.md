@@ -4,7 +4,7 @@ Implementing multi models for Text Classification in TensorFlow.
 ## Contents
 ### Data and Preprocess
 #### Data
-Models are used to perform sentiment analysis on movie reviews from the [Movie Review data from Rotten Tomatoes](http://www.cs.cornell.edu/people/pabo/movie-review-data/), which contains 10,662 example review sentences, half positive and half negative.<br/>
+Models are used to perform sentiment analysis on movie reviews from the [Large Movie Review Dataset](http://ai.stanford.edu/~amaas/data/sentiment/), which contains 25,000 highly polar movie reviews for training, and 25,000 for testing.<br/>
 In this task, given a movie review, the model attempts to predict whether it is positive or negative. This is a binary classification task.
 
 #### Preprocess
