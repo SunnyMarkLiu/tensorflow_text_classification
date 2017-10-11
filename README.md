@@ -29,6 +29,7 @@ In this task, given a movie review, the model attempts to predict whether it is 
 - [Implementing a CNN for Text Classification in TensorFlow](http://www.wildml.com/2015/12/implementing-a-cnn-for-text-classification-in-tensorflow)
 - [A Sensitivity Analysis of (and Practitioners' Guide to) Convolutional Neural Networks for Sentence Classification](https://arxiv.org/abs/1510.03820)
 - [LSTM Networks for Sentiment Analysis](http://deeplearning.net/tutorial/lstm.html)
+- [Github: cnn-text-classification-tf](https://github.com/cahya-wirawan/cnn-text-classification-tf)
 
 ## License
 This project is licensed under the terms of the MIT license.

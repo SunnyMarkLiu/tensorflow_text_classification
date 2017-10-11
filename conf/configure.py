@@ -18,3 +18,5 @@ class Configure(object):
 
     positive_data_file = '../input/rt-polarity.pos'
     negative_data_file = '../input/rt-polarity.neg'
+
+    glove_word_embedding_file = '/d_2t/lq/word_vector/glove/glove.840B.300d.txt'

@@ -27,6 +27,63 @@ stop_words = ['the', 'a', 'an', 'and', 'but', 'if', 'or', 'because', 'as', 'what
               'during', 'to', 'What', 'Which', 'Is', 'If', 'While', 'This']
 
 
+def batch_iter(data, batch_size, num_epochs, shuffle=True):
+    """
+    Generates a batch iterator for a dataset.
+    """
+    data = np.array(data)
+    data_size = len(data)
+    num_batches_per_epoch = int((len(data) - 1) / batch_size) + 1
+    for epoch in range(num_epochs):
+        # Shuffle the data at each epoch
+        if shuffle:
+            shuffle_indices = np.random.permutation(np.arange(data_size))
+            shuffled_data = data[shuffle_indices]
+        else:
+            shuffled_data = data
+        for batch_num in range(num_batches_per_epoch):
+            start_index = batch_num * batch_size
+            end_index = min((batch_num + 1) * batch_size, data_size)
+            yield shuffled_data[start_index:end_index]
+
+
+class DataWrapper(object):
+    def __init__(self, x, y=None, istrain=False):
+        self.x = x
+        self.y = y
+        self.pointer = 0
+        self.total_count = self.x.shape[0]
+        self.istrain = istrain
+
+    def shuffle(self):
+        shuffled_index = np.arange(0, self.total_count)
+        np.random.shuffle(shuffled_index)
+        self.x = self.x[shuffled_index]
+        if self.istrain:
+            self.y = self.y[shuffled_index]
+
+    def load_all_data(self):
+        return self.next_batch(self.x.shape[0])
+
+    def next_batch(self, batch_size):
+        end = self.pointer + batch_size
+        if end > self.total_count:
+            end = self.total_count
+
+        batch_x = self.x[self.pointer: end]
+        batch_y = None
+        if self.istrain:
+            batch_y = self.y[self.pointer: end]
+
+        self.pointer = end
+
+        if self.pointer == self.total_count:
+            self.shuffle()
+            self.pointer = 0
+
+        return batch_x, batch_y
+
+
 def load_text_datasets():
     """
     Loads MR polarity data from files, splits the data into words and generates labels.
@@ -57,7 +114,7 @@ def load_embedding_vectors_glove(vocabulary, glove_w2c_filename, vector_size):
     :return: [vocabulary_size, embedding_size]
     """
     # initial matrix with random uniform
-    embedding_vectors = np.random.uniform(-0.25, 0.25, (len(vocabulary), vector_size))
+    word_embeddings = np.random.uniform(-0.25, 0.25, (len(vocabulary), vector_size))
     f = open(glove_w2c_filename)
     for line in f:
         values = line.split()
@@ -65,9 +122,9 @@ def load_embedding_vectors_glove(vocabulary, glove_w2c_filename, vector_size):
         vector = np.asarray(values[1:], dtype="float32")
         idx = vocabulary.get(word)
         if idx != 0:
-            embedding_vectors[idx] = vector
+            word_embeddings[idx] = vector
     f.close()
-    return embedding_vectors
+    return word_embeddings
 
 
 class TextCleaner(object):

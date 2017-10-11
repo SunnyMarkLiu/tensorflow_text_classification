@@ -27,10 +27,9 @@ class FastText(object):
         self.vocabulary_size = vocabulary_size
         self.embedding_trainable = embedding_trainable
 
-        # Placeholders for input, output and dropout
+        # Placeholders for input, output
         self.sentence = tf.placeholder(tf.int32, [None, sequence_length], name="input_x")
         self.labels = tf.placeholder(tf.float32, [None, self.label_size], name="input_y")
-        self.dropout_keep_prob = tf.placeholder(tf.float32, name="dropout_keep_prob")
         self.learning_rate = tf.placeholder(tf.float32)
 
         # built fasttext model architecture
@@ -62,3 +61,8 @@ class FastText(object):
         with tf.name_scope("loss"):
             losses = tf.nn.softmax_cross_entropy_with_logits(logits=self.logits, labels=self.labels)
             self.loss = tf.reduce_mean(losses)
+
+        with tf.name_scope("accuracy"):
+            labels = tf.argmax(self.labels, 1)
+            self.predictions = tf.argmax(self.logits, 1, name="predictions")
+            self.accuracy = tf.reduce_mean(tf.cast(tf.equal(self.predictions, labels), "float"), name="accuracy")
