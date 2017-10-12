@@ -7,12 +7,10 @@
 """
 from __future__ import absolute_import, division, print_function
 
+import math
 import os
 import sys
-
 import time
-import math
-import datetime
 
 module_path = os.path.abspath(os.path.join('..'))
 sys.path.append(module_path)
@@ -32,6 +30,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 # ==================================================
 
 # Data loading params
+tf.flags.DEFINE_float('test_split_percentage', 0.2, 'Percentage of the training data to use for validation')
 tf.flags.DEFINE_float('validate_split_percentage', 0.1, 'Percentage of the training data to use for validation')
 
 # Model Hyperparameters
@@ -39,15 +38,15 @@ tf.flags.DEFINE_integer('embedding_dim', 300, 'Dimensionality of word embedding 
 tf.flags.DEFINE_float('dropout_keep_prob', 0.5, "Dropout keep probability (default: 0.5)")
 
 # Training parameters
-tf.flags.DEFINE_integer("max_learning_rate", 0.001, "Max learning_rate when start training (default: 0.01)")
-tf.flags.DEFINE_integer("min_learning_rate", 0.00001, "Min learning_rate when start training (default: 0.0001)")
-tf.flags.DEFINE_integer("batch_size", 32, "Batch Size (default: 64)")
-tf.flags.DEFINE_integer("epochs", 200, "Number of training epochs (default: 200)")
+tf.flags.DEFINE_integer("max_learning_rate", 0.01, "Max learning_rate when start training (default: 0.01)")
+tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
+tf.flags.DEFINE_integer("epochs", 10, "Number of training epochs (default: 200)")
 tf.flags.DEFINE_integer("train_verbose_every_steps", 50, "Show the training info every steps (default: 100)")
-tf.flags.DEFINE_integer("evaluate_every_steps", 1000, "Evaluate model on dev set after this many steps (default: 100)")
+tf.flags.DEFINE_integer("evaluate_every_steps", 100, "Evaluate model on dev set after this many steps (default: 100)")
 tf.flags.DEFINE_integer("checkpoint_every_steps", 1000, "Save model after this many steps (default: 100)")
 tf.flags.DEFINE_integer("max_num_checkpoints_to_keep", 5, "Number of checkpoints to store (default: 5)")
-tf.flags.DEFINE_float("decay_coefficient", 5.0, "Decay coefficient (default: 2.5)")
+tf.flags.DEFINE_float("decay_rate", 0.8, "Learning rate decay rate (default: 0.9)")
+tf.flags.DEFINE_float("decay_steps", 2000, "Perform learning rate decay step (default: 10000)")
 
 FLAGS = tf.flags.FLAGS
 
@@ -65,8 +64,10 @@ print('---> load train text dataset')
 x_text, y = data_util.load_text_datasets()
 
 print('---> build vocabulary according this text dataset')
-max_document_length = max([len(x.split(" ")) for x in x_text])
-print('max_document_length = {}'.format(max_document_length))
+document_len = np.array([len(x.split(" ")) for x in x_text])
+print('document_length, max = {}, mean = {}, min = {}'.format(document_len.max(), document_len.mean(),
+                                                              document_len.min()))
+max_document_length = 200
 vocab_processor = learn.preprocessing.VocabularyProcessor(max_document_length=max_document_length)
 # Maps documents to sequences of word ids in vocabulary
 x = np.array(list(vocab_processor.fit_transform(x_text)))
@@ -79,14 +80,20 @@ shuffle_indices = np.random.permutation(np.arange(len(y)))
 x = x[shuffle_indices]
 y = y[shuffle_indices]
 
-print('---> Split train/validate set')
-valid_sample_index = -1 * int(FLAGS.validate_split_percentage * float(len(y)))
-x_train, x_valid = x[:valid_sample_index], x[valid_sample_index:]
-y_train, y_valid = y[:valid_sample_index], y[valid_sample_index:]
-print("Train/Dev split: {:d}/{:d}".format(len(y_train), len(y_valid)))
+print('---> Split train/validate/test set')
+test_sample_index = -1 * int(FLAGS.test_split_percentage * float(len(y)))
+x_train, x_test = x[:test_sample_index], x[test_sample_index:]
+y_train, y_test = y[:test_sample_index], y[test_sample_index:]
+
+valid_sample_index = -1 * int(FLAGS.validate_split_percentage * float(len(x_train)))
+x_train, x_valid = x_train[:valid_sample_index], x_train[valid_sample_index:]
+y_train, y_valid = y_train[:valid_sample_index], y_train[valid_sample_index:]
+
+print("train/valid/test split: {:d}/{:d}/{:d}".format(len(y_train), len(y_valid), len(y_test)))
 print('---> create train/valid data wapper')
 train_data_wrapper = data_util.DataWrapper(x_train, y_train, istrain=True)
-valid_data_wrapper = data_util.DataWrapper(x_valid, y_valid, istrain=False)
+valid_data_wrapper = data_util.DataWrapper(x_valid, y_valid, istrain=True)
+test_data_wrapper = data_util.DataWrapper(x_valid, y_valid, istrain=False)
 
 print('---> build model')
 # Built model and start training
@@ -101,7 +108,7 @@ with tf.Graph().as_default(), tf.device('/gpu:2'):
                              sequence_length=max_document_length,
                              label_size=2,
                              vocabulary_size=vocabulary_size,
-                             embedding_trainable=False)
+                             embedding_trainable=True)
 
         # Define global training procedure
         global_step = tf.Variable(0, name="global_step", trainable=False)
@@ -125,7 +132,7 @@ with tf.Graph().as_default(), tf.device('/gpu:2'):
         grad_summaries_merged = tf.summary.merge(grad_summaries)
 
         # Output directory for models and summaries
-        timestamp = str(time.time())
+        timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
         out_dir = os.path.abspath(os.path.join(os.path.curdir, "run", timestamp))
         print("---> write logs and summaries to {}".format(out_dir))
 
@@ -135,7 +142,8 @@ with tf.Graph().as_default(), tf.device('/gpu:2'):
         accuracy_summary = tf.summary.scalar("accuracy", fast_text.accuracy)
 
         # Merge Summaries for train
-        train_summary_op = tf.summary.merge([learning_rate_summary, loss_summary, accuracy_summary, grad_summaries_merged])
+        train_summary_op = tf.summary.merge(
+            [learning_rate_summary, loss_summary, accuracy_summary, grad_summaries_merged])
         train_summary_dir = os.path.join(out_dir, "summaries", "train")
         train_summary_writer = tf.summary.FileWriter(logdir=train_summary_dir, graph=session.graph)
 
@@ -175,13 +183,13 @@ with tf.Graph().as_default(), tf.device('/gpu:2'):
                 fast_text.labels: y_batch,
                 fast_text.learning_rate: learning_rate_
             }
-            _, step, summaries, loss, accuracy = session.run([train_op, global_step, train_summary_op,
+            _, step, summaries, loss_, accuracy_ = session.run([train_op, global_step, train_summary_op,
                                                               fast_text.loss, fast_text.accuracy],
                                                              feed_dict=feed_dict)
             if step % FLAGS.train_verbose_every_steps == 0:
-                time_str = datetime.datetime.now().isoformat()
+                time_str_ = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
                 print("train {}: step {}, loss {:g}, acc {:g}, learning_rate {:g}"
-                      .format(time_str, step, loss, accuracy, learning_rate_))
+                      .format(time_str_, step, loss_, accuracy_, learning_rate_))
 
             train_summary_writer.add_summary(summaries, step)
 
@@ -192,27 +200,28 @@ with tf.Graph().as_default(), tf.device('/gpu:2'):
                 fast_text.sentence: x_batch,
                 fast_text.labels: y_batch
             }
-            step, summaries, loss, accuracy = session.run([global_step, valid_summary_op,
-                                                           fast_text.loss, fast_text.accuracy],
-                                                          feed_dict=feed_dict)
-            time_str = datetime.datetime.now().isoformat()
-            print("---> valid {}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
+            summaries, loss_, accuracy_ = session.run([valid_summary_op,
+                                                     fast_text.loss, fast_text.accuracy],
+                                                     feed_dict=feed_dict)
             if valid_writer:
                 valid_writer.add_summary(summaries, current_step)
+            return loss_, accuracy_
 
 
         max_learning_rate = FLAGS.max_learning_rate
-        min_learning_rate = FLAGS.min_learning_rate
+        decay_rate = FLAGS.decay_rate
+        decay_steps = FLAGS.decay_steps
 
         total_train_steps = FLAGS.epochs * (x_train.shape[0] // FLAGS.batch_size)
-        decay_speed = FLAGS.decay_coefficient * len(y_train) / FLAGS.batch_size
+        # decay_speed = FLAGS.decay_coefficient * len(y_train) / FLAGS.batch_size
 
         print('---> total train steps: {}'.format(total_train_steps))
         counter = 0
+        start_train_time = time.time()
         for epoch in range(FLAGS.epochs):
             print('-----> train epoch: {:d}/{:d}'.format(epoch + 1, FLAGS.epochs))
-            for _ in range(x_train.shape[0] // FLAGS.batch_size):
-                learning_rate = min_learning_rate + (max_learning_rate - min_learning_rate) * math.exp(-counter / decay_speed)
+            for i in range(x_train.shape[0] // FLAGS.batch_size):
+                learning_rate = max_learning_rate * math.pow(decay_rate, int(counter / decay_steps))
                 counter += 1
 
                 batch_x, batch_y = train_data_wrapper.next_batch(FLAGS.batch_size)
@@ -222,8 +231,40 @@ with tf.Graph().as_default(), tf.device('/gpu:2'):
 
                 if current_step % FLAGS.evaluate_every_steps == 0:
                     print('---> perform validate')
-                    valid_step(batch_x, batch_y, valid_summary_writer)
+
+                    losses = []; accuracies = []
+                    for _ in range(valid_data_wrapper.x.shape[0] // FLAGS.batch_size + 1):
+                        val_x, val_y = valid_data_wrapper.next_batch(FLAGS.batch_size)
+                        loss, accuracy = valid_step(val_x, val_y, valid_summary_writer)
+                        losses.append(loss)
+                        accuracies.append(accuracy)
+
+                    time_str = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+                    print("---> valid {}: step: {:d}, loss {:g}, acc {:g}".format(time_str, current_step, np.mean(losses), np.mean(accuracies)))
 
                 if current_step % FLAGS.checkpoint_every_steps == 0:
                     path = saver.save(session, checkpoint_prefix, global_step=global_step)
                     print('---> save model to checkpoint: {}'.format(path))
+
+        end_train_time = time.time()
+        print('============ end training, cast {:.2f}s ============'.format(end_train_time - start_train_time))
+        print('---> predict test')
+
+        def test_step(x_batch, y_batch):
+            """ test step """
+            feed_dict = {
+                fast_text.sentence: x_batch,
+                fast_text.labels: y_batch
+            }
+            accuracy_ = session.run(fast_text.accuracy, feed_dict=feed_dict)
+            return accuracy_
+
+
+        accuracies = []
+        for j in range(test_data_wrapper.x.shape[0] // FLAGS.batch_size + 1):
+            test_x, test_y = valid_data_wrapper.next_batch(FLAGS.batch_size)
+            accuracy = test_step(test_x, test_y)
+            accuracies.append(accuracy * test_x.shape[0])
+
+        accuracy = 1.0 * np.sum(accuracies) / test_data_wrapper.x.shape[0]
+        print('test accuracy : {:g}'.format(accuracy))
