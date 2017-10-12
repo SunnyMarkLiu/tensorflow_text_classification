@@ -1,4 +1,4 @@
-# tensorFlow_text_classification
+# tensorflow_text_classification
 Implementing multi models for Text Classification in TensorFlow.
 
 ## Contents
@@ -19,10 +19,24 @@ In this task, given a movie review, the model attempts to predict whether it is 
 2. text classification: [Bag of Tricks for Efficient Text Classification](https://github.com/SunnyMarkLiu/MachineLearning-DeepLearning-Papers/blob/master/Deep%20Learning/Natural%20Language%20Processing/Sentence%20classification/Bag%20of%20Tricks%20for%20Efficient%20Text%20Classification.pdf)
 
 ### Results
-| Models     | FastText | right |
+- train/valid/test size = 30908/3434/8585
+- glove word vector embedding dims = 300
+- max_document_length = 200
+- max_learning_rate = 0.01, decay_rate = 0.8, decay_steps = 2000
+- epochs = 10
+- embedding_trainable = False
+
+| Models     | FastText | TextCNN |
 | :----:     | :----:   | :----: |
-| Train Time |  |  |
-| Accuracy   |  |  |
+| Accuracy   | 0.832848 |  |
+| Training   |  67.01s  |  |
+
+- embedding_trainable = True
+
+| Models     | FastText | TextCNN |
+| :----:     | :----:   | :----: |
+| Accuracy   | 0.854397 |  |
+| Training   | 2352.95s |  |
 
 ## References
 - [Understanding Convolutional Neural Networks for NLP](http://www.wildml.com/2015/11/understanding-convolutional-neural-networks-for-nlp/)
