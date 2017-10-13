@@ -21,3 +21,5 @@ class Configure(object):
 
     glove_word_embedding_file = '/d_2t/lq/word_vector/glove/glove.840B.300d.txt'
     glove_word_embedding_matrix = '../input/glove_word_embedding_matrix.pkl'
+
+    dataset_path = '../input/dataset.pkl'

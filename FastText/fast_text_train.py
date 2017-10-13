@@ -15,6 +15,7 @@ import time
 module_path = os.path.abspath(os.path.join('..'))
 sys.path.append(module_path)
 
+import h5py
 import numpy as np
 import tensorflow as tf
 from tensorflow.contrib import learn
@@ -47,6 +48,7 @@ tf.flags.DEFINE_integer("checkpoint_every_steps", 1000, "Save model after this m
 tf.flags.DEFINE_integer("max_num_checkpoints_to_keep", 5, "Number of checkpoints to store (default: 5)")
 tf.flags.DEFINE_float("decay_rate", 0.8, "Learning rate decay rate (default: 0.9)")
 tf.flags.DEFINE_float("decay_steps", 2000, "Perform learning rate decay step (default: 10000)")
+tf.flags.DEFINE_float("l2_reg_lambda", 0.0, "L2 regulaization rate (default: 10000)")
 
 FLAGS = tf.flags.FLAGS
 
@@ -74,20 +76,38 @@ x = np.array(list(vocab_processor.fit_transform(x_text)))
 
 vocabulary_size = len(vocab_processor.vocabulary_)
 print('built vocabulary size: {:d}'.format(vocabulary_size))
-# Randomly shuffle data
-np.random.seed(10)
-shuffle_indices = np.random.permutation(np.arange(len(y)))
-x = x[shuffle_indices]
-y = y[shuffle_indices]
 
-print('---> Split train/validate/test set')
-test_sample_index = -1 * int(FLAGS.test_split_percentage * float(len(y)))
-x_train, x_test = x[:test_sample_index], x[test_sample_index:]
-y_train, y_test = y[:test_sample_index], y[test_sample_index:]
+if not os.path.exists(Configure.dataset_path):
+    # Randomly shuffle data
+    np.random.seed(10)
+    shuffle_indices = np.random.permutation(np.arange(len(y)))
+    x = x[shuffle_indices]
+    y = y[shuffle_indices]
 
-valid_sample_index = -1 * int(FLAGS.validate_split_percentage * float(len(x_train)))
-x_train, x_valid = x_train[:valid_sample_index], x_train[valid_sample_index:]
-y_train, y_valid = y_train[:valid_sample_index], y_train[valid_sample_index:]
+    print('---> Split train/validate/test set')
+    test_sample_index = -1 * int(FLAGS.test_split_percentage * float(len(y)))
+    x_train, x_test = x[:test_sample_index], x[test_sample_index:]
+    y_train, y_test = y[:test_sample_index], y[test_sample_index:]
+
+    valid_sample_index = -1 * int(FLAGS.validate_split_percentage * float(len(x_train)))
+    x_train, x_valid = x_train[:valid_sample_index], x_train[valid_sample_index:]
+    y_train, y_valid = y_train[:valid_sample_index], y_train[valid_sample_index:]
+
+    f = h5py.File(Configure.dataset_path, 'w')
+    f['x_train'] = x_train; f['y_train'] = y_train
+    f['x_test'] = x_test; f['y_test'] = y_test
+    f['x_valid'] = x_valid; f['y_valid'] = y_valid
+    f.flush()
+    f.close()
+else:
+    f = h5py.File(Configure.dataset_path, 'r')
+    x_train = f['x_train'][:]
+    y_train = f['y_train'][:]
+    x_test = f['x_test'][:]
+    y_test = f['y_test'][:]
+    x_valid = f['x_valid'][:]
+    y_valid = f['y_valid'][:]
+    f.close()
 
 print("train/valid/test split: {:d}/{:d}/{:d}".format(len(y_train), len(y_valid), len(y_test)))
 print('---> create train/valid data wapper')
@@ -108,7 +128,8 @@ with tf.Graph().as_default(), tf.device('/gpu:2'):
                              sequence_length=max_document_length,
                              label_size=2,
                              vocabulary_size=vocabulary_size,
-                             embedding_trainable=True)
+                             embedding_trainable=False,
+                             l2_reg_lambda=FLAGS.l2_reg_lambda)
 
         # Define global training procedure
         global_step = tf.Variable(0, name="global_step", trainable=False)

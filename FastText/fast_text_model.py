@@ -17,7 +17,8 @@ import tensorflow as tf
 
 
 class FastText(object):
-    def __init__(self, embedding_dim, sequence_length, label_size, vocabulary_size, embedding_trainable=False):
+    def __init__(self, embedding_dim, sequence_length, label_size, vocabulary_size,
+                 embedding_trainable=False, l2_reg_lambda=0.0):
         """
         init the model with hyper-parameters etc
         """
@@ -31,6 +32,8 @@ class FastText(object):
         self.sentence = tf.placeholder(tf.int32, [None, sequence_length], name="input_x")
         self.labels = tf.placeholder(tf.float32, [None, self.label_size], name="input_y")
         self.learning_rate = tf.placeholder(tf.float32)
+
+        self.l2_reg_lambda = l2_reg_lambda
 
         # built fasttext model architecture
         self.built_model()
@@ -59,8 +62,14 @@ class FastText(object):
             self.logits = tf.add(tf.matmul(self.sentence_embedding, self.W), self.b, name='logits')
 
         with tf.name_scope("loss"):
+            l2_loss = tf.constant(0.0)
+            if self.embedding_trainable:
+                l2_loss += tf.nn.l2_loss(self.word_embedding_matrix)
+
+            l2_loss += tf.nn.l2_loss(self.W)
+            l2_loss += tf.nn.l2_loss(self.b)
             losses = tf.nn.softmax_cross_entropy_with_logits(logits=self.logits, labels=self.labels)
-            self.loss = tf.reduce_mean(losses)
+            self.loss = tf.reduce_mean(losses) + self.l2_reg_lambda * l2_loss
 
         with tf.name_scope("accuracy"):
             labels = tf.argmax(self.labels, 1)

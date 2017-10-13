@@ -61,6 +61,7 @@ class DataWrapper(object):
 
     def shuffle(self):
         shuffled_index = np.arange(0, self.total_count)
+        np.random.seed(10)
         np.random.shuffle(shuffled_index)
         self.x = self.x[shuffled_index]
         if self.istrain:
