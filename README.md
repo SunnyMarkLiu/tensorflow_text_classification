@@ -10,9 +10,9 @@ In this task, given a movie review, the model attempts to predict whether it is 
 #### Preprocess
 1. Load positive and negative sentences from the raw data files.
 2. Clean the text data.
-3. Pad each sentence to the maximum sentence length. We append special <PAD> tokens to all other sentences to make them 59 words. Padding sentences to the same length is useful because it allows us to efficiently batch our data since each example in a batch must be of the same length.
+3. Pad each sentence to the maximum sentence length.
 4. Word vector mapping, Each sentence becomes a bag of word vectors.
-
+z
 ### Models
 #### FastText
 1. word representations: [Enriching Word Vectors with Subword Information](https://github.com/SunnyMarkLiu/MachineLearning-DeepLearning-Papers/blob/master/Deep%20Learning/Natural%20Language%20Processing/Word%20Embedding/Enriching%20Word%20Vectors%20with%20Subword%20Information.pdf)
@@ -29,7 +29,7 @@ In this task, given a movie review, the model attempts to predict whether it is 
 | Models     | FastText | TextCNN |
 | :----:     | :----:   | :----: |
 | Accuracy   | 0.832848 |  |
-| Training   |  67.01s  |  |
+| Training   |  48.94s  |  |
 
 - embedding_trainable = True
 

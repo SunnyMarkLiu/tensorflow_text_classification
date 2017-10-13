@@ -48,13 +48,14 @@ tf.flags.DEFINE_integer("checkpoint_every_steps", 1000, "Save model after this m
 tf.flags.DEFINE_integer("max_num_checkpoints_to_keep", 5, "Number of checkpoints to store (default: 5)")
 tf.flags.DEFINE_float("decay_rate", 0.8, "Learning rate decay rate (default: 0.9)")
 tf.flags.DEFINE_float("decay_steps", 2000, "Perform learning rate decay step (default: 10000)")
-tf.flags.DEFINE_float("l2_reg_lambda", 0.0, "L2 regulaization rate (default: 10000)")
+tf.flags.DEFINE_float("l2_reg_lambda", 1e-4, "L2 regulaization rate (default: 10000)")
 
 FLAGS = tf.flags.FLAGS
 
-print(' ================ Training Parameters ================')
+print('Training Parameters:')
 for attr, value in sorted(FLAGS.__flags.items()):
     print("{} = {}".format(attr.upper(), value))
+print("")
 
 embedding_dimension = FLAGS.embedding_dim
 
@@ -128,7 +129,7 @@ with tf.Graph().as_default(), tf.device('/gpu:2'):
                              sequence_length=max_document_length,
                              label_size=2,
                              vocabulary_size=vocabulary_size,
-                             embedding_trainable=False,
+                             embedding_trainable=True,
                              l2_reg_lambda=FLAGS.l2_reg_lambda)
 
         # Define global training procedure
@@ -153,7 +154,7 @@ with tf.Graph().as_default(), tf.device('/gpu:2'):
         grad_summaries_merged = tf.summary.merge(grad_summaries)
 
         # Output directory for models and summaries
-        timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+        timestamp = time.strftime('%Y_%m_%d_%H_%M_%S', time.localtime(time.time()))
         out_dir = os.path.abspath(os.path.join(os.path.curdir, "run", timestamp))
         print("---> write logs and summaries to {}".format(out_dir))
 

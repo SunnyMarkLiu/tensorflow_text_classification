@@ -52,12 +52,13 @@ def batch_iter(data, batch_size, num_epochs, shuffle=True):
 
 
 class DataWrapper(object):
-    def __init__(self, x, y=None, istrain=False):
+    def __init__(self, x, y=None, istrain=False, is_shuffle=True):
         self.x = x
         self.y = y
         self.pointer = 0
         self.total_count = self.x.shape[0]
         self.istrain = istrain
+        self.is_shuffle = is_shuffle
 
     def shuffle(self):
         shuffled_index = np.arange(0, self.total_count)
@@ -83,8 +84,9 @@ class DataWrapper(object):
         self.pointer = end
 
         if self.pointer == self.total_count:
-            self.shuffle()
-            self.pointer = 0
+            if self.is_shuffle:
+                self.shuffle()
+                self.pointer = 0
 
         return batch_x, batch_y
 
