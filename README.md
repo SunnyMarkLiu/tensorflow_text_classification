@@ -1,4 +1,4 @@
-# tensorflow_text_classification
+# text classification in tensorflow
 Implementing multi models for Text Classification in TensorFlow.
 
 ## Contents
@@ -12,11 +12,15 @@ In this task, given a movie review, the model attempts to predict whether it is 
 2. Clean the text data.
 3. Pad each sentence to the maximum sentence length.
 4. Word vector mapping, Each sentence becomes a bag of word vectors.
-z
+
 ### Models
-#### FastText
-1. word representations: [Enriching Word Vectors with Subword Information](https://github.com/SunnyMarkLiu/MachineLearning-DeepLearning-Papers/blob/master/Deep%20Learning/Natural%20Language%20Processing/Word%20Embedding/Enriching%20Word%20Vectors%20with%20Subword%20Information.pdf)
-2. text classification: [Bag of Tricks for Efficient Text Classification](https://github.com/SunnyMarkLiu/MachineLearning-DeepLearning-Papers/blob/master/Deep%20Learning/Natural%20Language%20Processing/Sentence%20classification/Bag%20of%20Tricks%20for%20Efficient%20Text%20Classification.pdf)
+#### 1. FastText
+![](./imgs/fast_text_model.png)
+- word representations: [Enriching Word Vectors with Subword Information](https://github.com/SunnyMarkLiu/MachineLearning-DeepLearning-Papers/blob/master/Deep%20Learning/Natural%20Language%20Processing/Word%20Embedding/Enriching%20Word%20Vectors%20with%20Subword%20Information.pdf)
+- text classification: [Bag of Tricks for Efficient Text Classification](https://github.com/SunnyMarkLiu/MachineLearning-DeepLearning-Papers/blob/master/Deep%20Learning/Natural%20Language%20Processing/Sentence%20classification/Bag%20of%20Tricks%20for%20Efficient%20Text%20Classification.pdf)
+
+#### 2. TextCNN
+- [Convolutional Neural Networks for Sentence Classification](https://github.com/SunnyMarkLiu/MachineLearning-DeepLearning-Papers/blob/master/Deep%20Learning/Natural%20Language%20Processing/Sentence%20classification/Convolutional%20Neural%20Networks%20for%20Sentence%20Classification.pdf)
 
 ### Results
 - train/valid/test size = 30908/3434/8585
