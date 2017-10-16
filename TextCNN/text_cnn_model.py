@@ -34,7 +34,7 @@ class TextCNN(object):
         # Placeholders for input, output
         self.sentence = tf.placeholder(tf.int32, [None, sequence_length], name="input_x")
         self.labels = tf.placeholder(tf.float32, [None, self.label_size], name="input_y")
-        self.learning_rate = tf.placeholder(tf.float32, name='learning rate')
+        self.learning_rate = tf.placeholder(tf.float32, name='learning_rate')
         self.dropout_keep_ratio = tf.placeholder(tf.float32, name='dropout_keep_ratio')
 
         self.l2_reg_lambda = l2_reg_lambda
@@ -62,7 +62,7 @@ class TextCNN(object):
         # Create a convolution + maxpool layer for each filter size
         pooled_outputs = []
         for i, filter_size in enumerate(self.filter_sizes):
-            with tf.name_scope('conv-maxpool-%s'.format(filter_size)):
+            with tf.name_scope('conv_maxpool_{}'.format(filter_size)):
                 # Convolution layer
                 # [filter_height, filter_width, in_channels, out_channels]
                 filter_shape = [filter_size, self.embedding_dim, 1, self.num_filters]
@@ -71,7 +71,7 @@ class TextCNN(object):
                 # strides=[1，stride，stride，1]
                 conv = tf.nn.relu(
                     tf.nn.bias_add(
-                        tf.nn.conv2d(self.inputwords_embeddings, W, strides=[1, 1, 1, ], padding="VALID", name='conv'),
+                        tf.nn.conv2d(self.inputwords_embeddings, W, strides=[1, 1, 1, 1], padding="VALID", name='conv'),
                         b
                     )
                 )  # [batch, height, width, filters]
