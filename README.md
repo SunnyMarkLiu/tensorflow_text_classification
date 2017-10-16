@@ -16,11 +16,12 @@ In this task, given a movie review, the model attempts to predict whether it is 
 ### Models
 #### 1. FastText
 ![](./imgs/fast_text_model.png)
-- word representations: [Enriching Word Vectors with Subword Information](https://github.com/SunnyMarkLiu/MachineLearning-DeepLearning-Papers/blob/master/Deep%20Learning/Natural%20Language%20Processing/Word%20Embedding/Enriching%20Word%20Vectors%20with%20Subword%20Information.pdf)
-- text classification: [Bag of Tricks for Efficient Text Classification](https://github.com/SunnyMarkLiu/MachineLearning-DeepLearning-Papers/blob/master/Deep%20Learning/Natural%20Language%20Processing/Sentence%20classification/Bag%20of%20Tricks%20for%20Efficient%20Text%20Classification.pdf)
+- word representations: [Enriching Word Vectors with Subword Information](https://arxiv.org/abs/1607.04606)
+- text classification: [Bag of Tricks for Efficient Text Classification](https://arxiv.org/abs/1607.01759)
 
 #### 2. TextCNN
-- [Convolutional Neural Networks for Sentence Classification](https://github.com/SunnyMarkLiu/MachineLearning-DeepLearning-Papers/blob/master/Deep%20Learning/Natural%20Language%20Processing/Sentence%20classification/Convolutional%20Neural%20Networks%20for%20Sentence%20Classification.pdf)
+![](./imgs/text_cnn_model.png)
+- [Convolutional Neural Networks for Sentence Classification](https://arxiv.org/abs/1408.5882)
 
 ### Results
 - train/valid/test size = 30908/3434/8585
