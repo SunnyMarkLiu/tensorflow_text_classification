@@ -22,6 +22,7 @@ In this task, given a movie review, the model attempts to predict whether it is 
 #### 2. TextCNN
 ![](./imgs/text_cnn_model.png)
 - [Convolutional Neural Networks for Sentence Classification](https://arxiv.org/abs/1408.5882)
+- [A Sensitivity Analysis of (and Practitioners' Guide to) Convolutional Neural Networks for Sentence Classification](https://arxiv.org/abs/1510.03820)
 
 ### Results
 - train/valid/test size = 30908/3434/8585
@@ -49,6 +50,7 @@ In this task, given a movie review, the model attempts to predict whether it is 
 - [A Sensitivity Analysis of (and Practitioners' Guide to) Convolutional Neural Networks for Sentence Classification](https://arxiv.org/abs/1510.03820)
 - [LSTM Networks for Sentiment Analysis](http://deeplearning.net/tutorial/lstm.html)
 - [Github: cnn-text-classification-tf](https://github.com/cahya-wirawan/cnn-text-classification-tf)
+- [基于 word2vec 和 CNN 的文本分类 ：综述 & 实践](https://zhuanlan.zhihu.com/p/29076736)
 
 ## License
 This project is licensed under the terms of the MIT license.

@@ -74,7 +74,7 @@ class TextCNN(object):
                         tf.nn.conv2d(self.inputwords_embeddings, W, strides=[1, 1, 1, 1], padding="VALID", name='conv'),
                         b
                     )
-                )  # [batch, height, width, filters]
+                )  # [batch, sequence_length - filter_size + 1, 1, filters]
                 # Maxpooling
                 max_pooled = tf.nn.max_pool(conv,
                                             ksize=[1, self.sequence_length - filter_size + 1, 1, 1],
