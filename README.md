@@ -21,6 +21,7 @@ In this task, given a movie review, the model attempts to predict whether it is 
 
 #### 2. TextCNN
 ![](./imgs/text_cnn_model.png)
+![](./imgs/text_cnn_model_explain.png)
 - [Convolutional Neural Networks for Sentence Classification](https://arxiv.org/abs/1408.5882)
 - [A Sensitivity Analysis of (and Practitioners' Guide to) Convolutional Neural Networks for Sentence Classification](https://arxiv.org/abs/1510.03820)
 
