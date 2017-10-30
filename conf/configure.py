@@ -16,10 +16,10 @@ sys.path.append(module_path)
 class Configure(object):
     """ global configuration """
 
-    positive_data_dir = '/d_2t/lq/tensorflow_text_classification/input/aclImdb/pos/'
-    negative_data_dir = '/d_2t/lq/tensorflow_text_classification/input/aclImdb/neg/'
+    positive_data_dir = '/data/sunnymarkliu/tensorflow_text_classification/input/aclImdb/pos/'
+    negative_data_dir = '/data/sunnymarkliu/tensorflow_text_classification/input/aclImdb/neg/'
 
-    glove_word_embedding_file = '/d_2t/lq/word_vector/glove/glove.840B.300d.txt'
+    glove_word_embedding_file = '/data/sunnymarkliu/pretrained_models/glove/Wikipedia_2014/glove.6B.300d.txt'
     glove_word_embedding_matrix = '../input/glove_word_embedding_matrix.pkl'
 
     dataset_path = '../input/dataset.pkl'

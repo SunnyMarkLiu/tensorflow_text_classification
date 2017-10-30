@@ -48,10 +48,10 @@ In this task, given a movie review, the model attempts to predict whether it is 
 ## References
 - [Understanding Convolutional Neural Networks for NLP](http://www.wildml.com/2015/11/understanding-convolutional-neural-networks-for-nlp/)
 - [Implementing a CNN for Text Classification in TensorFlow](http://www.wildml.com/2015/12/implementing-a-cnn-for-text-classification-in-tensorflow)
-- [A Sensitivity Analysis of (and Practitioners' Guide to) Convolutional Neural Networks for Sentence Classification](https://arxiv.org/abs/1510.03820)
-- [LSTM Networks for Sentiment Analysis](http://deeplearning.net/tutorial/lstm.html)
 - [Github: cnn-text-classification-tf](https://github.com/cahya-wirawan/cnn-text-classification-tf)
 - [基于 word2vec 和 CNN 的文本分类 ：综述 & 实践](https://zhuanlan.zhihu.com/p/29076736)
+- [自然语言处理中CNN模型几种常见的Max Pooling操作](http://blog.csdn.net/malefactor/article/details/51078135)
+- [LSTM Networks for Sentiment Analysis](http://deeplearning.net/tutorial/lstm.html)
 
 ## License
 This project is licensed under the terms of the MIT license.

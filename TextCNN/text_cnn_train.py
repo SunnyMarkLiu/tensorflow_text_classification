@@ -7,16 +7,14 @@
 """
 from __future__ import absolute_import, division, print_function
 
+import math
 import os
 import sys
-
-import math
 import time
 
 module_path = os.path.abspath(os.path.join('..'))
 sys.path.append(module_path)
 
-import h5py
 import numpy as np
 import tensorflow as tf
 from tensorflow.contrib import learn
@@ -37,6 +35,7 @@ tf.flags.DEFINE_float('validate_split_percentage', 0.1, 'Percentage of the train
 
 # Model Hyperparameters
 tf.flags.DEFINE_integer('embedding_dim', 300, 'Dimensionality of word embedding (default: 300)')
+tf.flags.DEFINE_integer('max_document_length', 200, 'Max document length (default: 200)')
 tf.flags.DEFINE_float('dropout_keep_ratio', 0.5, "Dropout keep probability (default: 0.5)")
 tf.flags.DEFINE_float('filter_sizes', [2,3,4,5], "Comma-separated filter sizes (default: '3,4,5')")
 tf.flags.DEFINE_integer('num_filters', 128, 'Number of filters per filter size (default: 128)')
@@ -45,13 +44,16 @@ tf.flags.DEFINE_integer('num_filters', 128, 'Number of filters per filter size (
 tf.flags.DEFINE_integer("max_learning_rate", 0.01, "Max learning_rate when start training (default: 0.01)")
 tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
 tf.flags.DEFINE_integer("epochs", 10, "Number of training epochs (default: 200)")
-tf.flags.DEFINE_integer("train_verbose_every_steps", 50, "Show the training info every steps (default: 100)")
+tf.flags.DEFINE_integer("train_verbose_every_steps", 10, "Show the training info every steps (default: 100)")
 tf.flags.DEFINE_integer("evaluate_every_steps", 100, "Evaluate model on dev set after this many steps (default: 100)")
 tf.flags.DEFINE_integer("checkpoint_every_steps", 1000, "Save model after this many steps (default: 100)")
 tf.flags.DEFINE_integer("max_num_checkpoints_to_keep", 5, "Number of checkpoints to store (default: 5)")
 tf.flags.DEFINE_float("decay_rate", 0.8, "Learning rate decay rate (default: 0.9)")
 tf.flags.DEFINE_float("decay_steps", 2000, "Perform learning rate decay step (default: 10000)")
 tf.flags.DEFINE_float("l2_reg_lambda", 1e-4, "L2 regulaization rate (default: 10000)")
+
+timestamp = time.strftime('%Y_%m_%d_%H_%M_%S', time.localtime(time.time()))
+tf.flags.DEFINE_string("log_message", timestamp, "log dir message (default: timestamp)")
 
 FLAGS = tf.flags.FLAGS
 
@@ -73,7 +75,7 @@ print('---> build vocabulary according this text dataset')
 document_len = np.array([len(x.split(" ")) for x in x_text])
 print('document_length, max = {}, mean = {}, min = {}'.format(document_len.max(), document_len.mean(),
                                                               document_len.min()))
-max_document_length = 200
+max_document_length = FLAGS.max_document_length
 vocab_processor = learn.preprocessing.VocabularyProcessor(max_document_length=max_document_length)
 # Maps documents to sequences of word ids in vocabulary
 x = np.array(list(vocab_processor.fit_transform(x_text)))
@@ -81,37 +83,14 @@ x = np.array(list(vocab_processor.fit_transform(x_text)))
 vocabulary_size = len(vocab_processor.vocabulary_)
 print('built vocabulary size: {:d}'.format(vocabulary_size))
 
-if not os.path.exists(Configure.dataset_path):
-    # Randomly shuffle data
-    np.random.seed(10)
-    shuffle_indices = np.random.permutation(np.arange(len(y)))
-    x = x[shuffle_indices]
-    y = y[shuffle_indices]
+print('---> Split train/validate/test set')
+test_sample_index = -1 * int(FLAGS.test_split_percentage * float(len(y)))
+x_train, x_test = x[:test_sample_index], x[test_sample_index:]
+y_train, y_test = y[:test_sample_index], y[test_sample_index:]
 
-    print('---> Split train/validate/test set')
-    test_sample_index = -1 * int(FLAGS.test_split_percentage * float(len(y)))
-    x_train, x_test = x[:test_sample_index], x[test_sample_index:]
-    y_train, y_test = y[:test_sample_index], y[test_sample_index:]
-
-    valid_sample_index = -1 * int(FLAGS.validate_split_percentage * float(len(x_train)))
-    x_train, x_valid = x_train[:valid_sample_index], x_train[valid_sample_index:]
-    y_train, y_valid = y_train[:valid_sample_index], y_train[valid_sample_index:]
-
-    f = h5py.File(Configure.dataset_path, 'w')
-    f['x_train'] = x_train; f['y_train'] = y_train
-    f['x_test'] = x_test; f['y_test'] = y_test
-    f['x_valid'] = x_valid; f['y_valid'] = y_valid
-    f.flush()
-    f.close()
-else:
-    f = h5py.File(Configure.dataset_path, 'r')
-    x_train = f['x_train'][:]
-    y_train = f['y_train'][:]
-    x_test = f['x_test'][:]
-    y_test = f['y_test'][:]
-    x_valid = f['x_valid'][:]
-    y_valid = f['y_valid'][:]
-    f.close()
+valid_sample_index = -1 * int(FLAGS.validate_split_percentage * float(len(x_train)))
+x_train, x_valid = x_train[:valid_sample_index], x_train[valid_sample_index:]
+y_train, y_valid = y_train[:valid_sample_index], y_train[valid_sample_index:]
 
 print("train/valid/test split: {:d}/{:d}/{:d}".format(len(y_train), len(y_valid), len(y_test)))
 print('---> create train/valid data wapper')
@@ -159,8 +138,7 @@ with tf.Graph().as_default(), tf.device('/gpu:2'):
         grad_summaries_merged = tf.summary.merge(grad_summaries)
 
         # Output directory for models and summaries
-        timestamp = time.strftime('%Y_%m_%d_%H_%M_%S', time.localtime(time.time()))
-        out_dir = os.path.abspath(os.path.join(os.path.curdir, "run", timestamp))
+        out_dir = os.path.abspath(os.path.join(os.path.curdir, "run", FLAGS.log_message))
         print("---> write logs and summaries to {}".format(out_dir))
 
         # Summaries for loss and accuracy
@@ -242,7 +220,6 @@ with tf.Graph().as_default(), tf.device('/gpu:2'):
         decay_steps = FLAGS.decay_steps
 
         total_train_steps = FLAGS.epochs * (x_train.shape[0] // FLAGS.batch_size)
-        # decay_speed = FLAGS.decay_coefficient * len(y_train) / FLAGS.batch_size
 
         print('---> total train steps: {}'.format(total_train_steps))
         counter = 0
@@ -269,7 +246,7 @@ with tf.Graph().as_default(), tf.device('/gpu:2'):
                         accuracies.append(accuracy)
 
                     time_str = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-                    print("---> valid {}: step: {:d}, loss {:g}, acc {:g}".format(time_str, current_step, np.mean(losses), np.mean(accuracies)))
+                    print("valid {}: step: {:d}, loss {:g}, acc {:g}".format(time_str, current_step, np.mean(losses), np.mean(accuracies)))
 
                 if current_step % FLAGS.checkpoint_every_steps == 0:
                     path = saver.save(session, checkpoint_prefix, global_step=global_step)
