@@ -39,9 +39,10 @@ tf.flags.DEFINE_integer('max_document_length', 200, 'Max document length (defaul
 tf.flags.DEFINE_float('dropout_keep_ratio', 0.5, "Dropout keep probability (default: 0.5)")
 tf.flags.DEFINE_float('filter_sizes', [2,3,4,5], "Comma-separated filter sizes (default: '3,4,5')")
 tf.flags.DEFINE_integer('num_filters', 128, 'Number of filters per filter size (default: 128)')
+tf.flags.DEFINE_bool('embedding_trainable', False, 'Word embedding trainable (default: False)')
 
 # Training parameters
-tf.flags.DEFINE_integer("max_learning_rate", 0.01, "Max learning_rate when start training (default: 0.01)")
+tf.flags.DEFINE_integer("max_learning_rate", 0.001, "Max learning_rate when start training (default: 0.01)")
 tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
 tf.flags.DEFINE_integer("epochs", 10, "Number of training epochs (default: 200)")
 tf.flags.DEFINE_integer("train_verbose_every_steps", 10, "Show the training info every steps (default: 100)")
@@ -56,6 +57,7 @@ timestamp = time.strftime('%Y_%m_%d_%H_%M_%S', time.localtime(time.time()))
 tf.flags.DEFINE_string("log_message", timestamp, "log dir message (default: timestamp)")
 
 FLAGS = tf.flags.FLAGS
+FLAGS._parse_flags()
 
 print('Training Parameters:')
 for attr, value in sorted(FLAGS.__flags.items()):

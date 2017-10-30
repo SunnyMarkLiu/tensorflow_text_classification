@@ -11,12 +11,17 @@ optional arguments:
                         Percentage of the training data to use for validation
   --embedding_dim EMBEDDING_DIM
                         Dimensionality of word embedding (default: 300)
+  --max_document_length MAX_DOCUMENT_LENGTH
+                        Max document length (default: 200)
   --dropout_keep_ratio DROPOUT_KEEP_RATIO
                         Dropout keep probability (default: 0.5)
   --filter_sizes FILTER_SIZES
                         Comma-separated filter sizes (default: '3,4,5')
   --num_filters NUM_FILTERS
                         Number of filters per filter size (default: 128)
+  --embedding_trainable [EMBEDDING_TRAINABLE]
+                        Word embedding trainable (default: False)
+  --noembedding_trainable
   --max_learning_rate MAX_LEARNING_RATE
                         Max learning_rate when start training (default: 0.01)
   --batch_size BATCH_SIZE
@@ -37,6 +42,8 @@ optional arguments:
                         Perform learning rate decay step (default: 10000)
   --l2_reg_lambda L2_REG_LAMBDA
                         L2 regulaization rate (default: 10000)
+  --log_message LOG_MESSAGE
+                        log dir message (default: timestamp)
 ```
 
 ## Train
