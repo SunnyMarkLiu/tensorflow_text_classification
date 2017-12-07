@@ -25,25 +25,9 @@ In this task, given a movie review, the model attempts to predict whether it is 
 - [Convolutional Neural Networks for Sentence Classification](https://arxiv.org/abs/1408.5882)
 - [A Sensitivity Analysis of (and Practitioners' Guide to) Convolutional Neural Networks for Sentence Classification](https://arxiv.org/abs/1510.03820)
 
-### Results
-- train/valid/test size = 30908/3434/8585
-- glove word vector embedding dims = 300
-- max_document_length = 200
-- max_learning_rate = 0.01, decay_rate = 0.8, decay_steps = 2000
-- epochs = 10
-- embedding_trainable = False
-
-| Models     | FastText | TextCNN |
-| :----:     | :----:   | :----: |
-| Accuracy   | 0.832848 |  |
-| Training   |  48.94s  |  |
-
-- embedding_trainable = True
-
-| Models     | FastText | TextCNN |
-| :----:     | :----:   | :----: |
-| Accuracy   | 0.854397 |  |
-| Training   | 2352.95s |  |
+#### 3. BiLSTM
+![](./imgs/bilstm_model.png)
+- [Bidirectional Recurrent Neural Networks](http://ieeexplore.ieee.org/document/650093/)
 
 ## References
 - [Understanding Convolutional Neural Networks for NLP](http://www.wildml.com/2015/11/understanding-convolutional-neural-networks-for-nlp/)
@@ -52,6 +36,7 @@ In this task, given a movie review, the model attempts to predict whether it is 
 - [基于 word2vec 和 CNN 的文本分类 ：综述 & 实践](https://zhuanlan.zhihu.com/p/29076736)
 - [自然语言处理中CNN模型几种常见的Max Pooling操作](http://blog.csdn.net/malefactor/article/details/51078135)
 - [LSTM Networks for Sentiment Analysis](http://deeplearning.net/tutorial/lstm.html)
+- [Bag of Tricks for Efficient Text Classification](https://arxiv.org/abs/1607.01759)
 
 ## License
 This project is licensed under the terms of the MIT license.
