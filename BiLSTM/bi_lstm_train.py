@@ -27,6 +27,9 @@ from conf.configure import Configure
 # disable TF debug logs
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+
 # Parameters
 # ==================================================
 
@@ -129,7 +132,7 @@ test_data_wrapper = data_util.DataWrapper(x_valid, y_valid, istrain=False)
 print('---> build model')
 # Built model and start training
 # ==================================================
-with tf.Graph().as_default(), tf.device('/gpu:2'):
+with tf.Graph().as_default(), tf.device('/gpu:1'):
     session_conf = tf.ConfigProto(
         allow_soft_placement=True,
         log_device_placement=False)

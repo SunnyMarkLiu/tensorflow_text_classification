@@ -18,17 +18,17 @@ from tensorflow.contrib import rnn
 
 
 class BiLSTM(object):
-    def __init__(self, sequence_length, label_size, vocabulary_size,
-                 embedding_dim, hidden_size,
-                 embedding_trainable=False, l2_reg_lambda=0.0,
+    def __init__(self, label_size, sequence_length, vocabulary_size, embedding_dim,
+                 hidden_size, embedding_trainable=False, l2_reg_lambda=0.0,
                  lstm_drop_out=False, input_keep_prob=1.0,
                  output_keep_prob=1.0, state_keep_prob=1.0):
-        self.sequence_length = sequence_length
+        # set hyperparamter
         self.label_size = label_size
+        self.sequence_length = sequence_length
         self.vocabulary_size = vocabulary_size
         self.embedding_dim = embedding_dim
         self.embedding_trainable = embedding_trainable
-        self.hidden_size = hidden_size,
+        self.hidden_size = hidden_size
         self.l2_reg_lambda = l2_reg_lambda
         self.lstm_drop_out = lstm_drop_out
         self.input_keep_prob = input_keep_prob
@@ -42,7 +42,6 @@ class BiLSTM(object):
 
         # build bilstm model architecture
         self.build_model()
-
 
     def build_model(self):
         """
@@ -61,19 +60,18 @@ class BiLSTM(object):
 
         # 2. Bi-LSTM layer
         with tf.name_scope('bilstm_layer'):
-            fw_lstm_cell = rnn.BasicLSTMCell(num_units=self.hidden_size)  # forward direction cell
-            bw_lstm_cell = rnn.BasicLSTMCell(num_units=self.hidden_size)  # backward direction cell
+            lstm_fw_cell = rnn.BasicLSTMCell(num_units=self.hidden_size)  # forward direction cell
+            lstm_bw_cell = rnn.BasicLSTMCell(num_units=self.hidden_size)  # backward direction cell
 
             if self.lstm_drop_out:
-                fw_lstm_cell = rnn.DropoutWrapper(cell=fw_lstm_cell,
+                lstm_fw_cell = rnn.DropoutWrapper(cell=lstm_fw_cell,
                                                   input_keep_prob=self.input_keep_prob,
                                                   output_keep_prob=self.output_keep_prob,
                                                   state_keep_prob=self.state_keep_prob)
-                bw_lstm_cell = rnn.DropoutWrapper(cell=bw_lstm_cell,
+                lstm_bw_cell = rnn.DropoutWrapper(cell=lstm_bw_cell,
                                                   input_keep_prob=self.input_keep_prob,
                                                   output_keep_prob=self.output_keep_prob,
                                                   state_keep_prob=self.state_keep_prob)
-
             '''
             bidirectional_dynamic_rnn: input:  [batch_size, sequence_length, embedding_dim], max_time == sequence_length
                                        output: A tuple (outputs, output_states)
@@ -81,15 +79,17 @@ class BiLSTM(object):
                                                output_fw: [batch_size, max_time, cell_fw.output_size]
                                                output_bw: [batch_size, max_time, cell_bw.output_size]
             '''
-            (fw_output, bw_output), _ = tf.nn.bidirectional_dynamic_rnn(fw_lstm_cell, bw_lstm_cell, self.embedded_sentence, dtype=tf.float32)
-            print("bidirectional_dynamic_rnn outputs: ", fw_output, bw_output)
+            (fw_output, bw_output), _ = tf.nn.bidirectional_dynamic_rnn(cell_fw=lstm_fw_cell,
+                                                                        cell_bw=lstm_bw_cell,
+                                                                        inputs=self.embedded_sentence,
+                                                                        dtype=tf.float32)
+            print("bidirectional_dynamic_rnn outputs: ", fw_output.get_shape(), bw_output.get_shape())
 
             # 3. concat, axis=2, concat cell_fw.output_size and cell_bw.output_size
-            output_rnn = tf.concat((fw_output, bw_output), axis=2) # [batch_size, sequence_length, hidden_size * 2]
-            print("concate output_rnn: ", output_rnn)
-
-            self.output_rnn_last = tf.reduce_mean(output_rnn, axis=1) # [batch_size, hidden_size * 2]
-            print("output_rnn_last: ", self.output_rnn_last)
+            output_rnn = tf.concat((fw_output, bw_output), axis=2)  # [batch_size, sequence_length, hidden_size * 2]
+            # last cell output
+            self.output_rnn_last = tf.reduce_mean(output_rnn, axis=1)  # [batch_size, hidden_size * 2]
+            print('last cell output:', self.output_rnn_last.get_shape())
 
         with tf.name_scope('readout'):
             # 4.linear classifier
@@ -98,11 +98,10 @@ class BiLSTM(object):
                                                 name='linear_W_projection')
             self.b_projection = tf.get_variable(shape=[self.label_size],
                                                 name='linear_b_projection')
-
             self.logits = tf.add(tf.matmul(self.output_rnn_last, self.W_projection), self.b_projection, name='logits')
 
         with tf.name_scope("loss"):
-            l2_loss = tf.constant(0)
+            l2_loss = tf.constant(0.0)
             if self.embedding_trainable:
                 l2_loss += tf.nn.l2_loss(self.embedding_matrix)
 
