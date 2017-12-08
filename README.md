@@ -30,6 +30,8 @@ In this task, given a movie review, the model attempts to predict whether it is 
 - [Bidirectional Recurrent Neural Networks](http://ieeexplore.ieee.org/document/650093/)
 
 #### 4. TextRCNN
+![](./imgs/rcnn_model.png)
+Learn more contextual information   than conventional window-based neural networks.
 - [Recurrent Convolutional Neural Networks for Text Classification](https://scholar.google.com.hk/scholar?q=Recurrent+Convolutional+Neural+Networks+for+Text+Classification&hl=zh-CN&as_sdt=0&as_vis=1&oi=scholart&sa=X&ved=0ahUKEwjpx82cvqTUAhWHspQKHUbDBDYQgQMIITAA)
 
 ## Performance

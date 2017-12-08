@@ -94,3 +94,4 @@ ENV/
 input/*.csv
 input/*.pkl
 .idea
+new model ideal.md
