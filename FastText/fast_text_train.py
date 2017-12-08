@@ -27,6 +27,9 @@ from conf.configure import Configure
 # disable TF debug logs
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+
 # Parameters
 # ==================================================
 
@@ -129,7 +132,7 @@ with tf.Graph().as_default(), tf.device('/gpu:2'):
                              sequence_length=max_document_length,
                              label_size=2,
                              vocabulary_size=vocabulary_size,
-                             embedding_trainable=True,
+                             embedding_trainable=False,
                              l2_reg_lambda=FLAGS.l2_reg_lambda)
 
         # Define global training procedure

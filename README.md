@@ -29,6 +29,24 @@ In this task, given a movie review, the model attempts to predict whether it is 
 ![](./imgs/bilstm_model.png)
 - [Bidirectional Recurrent Neural Networks](http://ieeexplore.ieee.org/document/650093/)
 
+#### 4. TextRCNN
+- [Recurrent Convolutional Neural Networks for Text Classification](https://scholar.google.com.hk/scholar?q=Recurrent+Convolutional+Neural+Networks+for+Text+Classification&hl=zh-CN&as_sdt=0&as_vis=1&oi=scholart&sa=X&ved=0ahUKEwjpx82cvqTUAhWHspQKHUbDBDYQgQMIITAA)
+
+## Performance
+```
+epochs = 10
+batch_size = 64
+max_learning_rate = 0.001
+decay_rate = 0.8
+decay_steps = 2000
+l2_reg_lambda = 1e-3
+embedding_trainable = False
+```
+
+Models   | fastText|TextCNN |BiLSTM | RCNN | HierAtteNet|Seq2seqAttn|EntityNet|DynamicMemory|Transformer
+---      | ---     | ---    |---    |---   |---         |---        |---      |---          |----
+Accuracy |0.834304 |0.774316| 0.884974 |      |            |           |         |             |
+
 ## References
 - [Understanding Convolutional Neural Networks for NLP](http://www.wildml.com/2015/11/understanding-convolutional-neural-networks-for-nlp/)
 - [Implementing a CNN for Text Classification in TensorFlow](http://www.wildml.com/2015/12/implementing-a-cnn-for-text-classification-in-tensorflow)
