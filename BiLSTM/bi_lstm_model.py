@@ -56,7 +56,7 @@ class BiLSTM(object):
                                                     trainable=self.embedding_trainable)
 
             # get emebedding of words in the sentence, [None, sequence_length, embedding_dim]
-            self.embedded_sentence = tf.nn.embedding_lookup(self.embedding_matrix, self.sentence)
+            self.embedded_words = tf.nn.embedding_lookup(self.embedding_matrix, self.sentence)
 
         # 2. Bi-LSTM layer
         with tf.name_scope('bilstm_layer'):
@@ -81,7 +81,7 @@ class BiLSTM(object):
             '''
             (fw_output, bw_output), _ = tf.nn.bidirectional_dynamic_rnn(cell_fw=lstm_fw_cell,
                                                                         cell_bw=lstm_bw_cell,
-                                                                        inputs=self.embedded_sentence,
+                                                                        inputs=self.embedded_words,
                                                                         dtype=tf.float32)
             print("bidirectional_dynamic_rnn outputs: ", fw_output.get_shape(), bw_output.get_shape())
 

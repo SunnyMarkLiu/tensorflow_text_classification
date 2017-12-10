@@ -45,7 +45,7 @@ l2_reg_lambda = 1e-3
 embedding_trainable = False
 ```
 
-Models   | fastText|TextCNN |BiLSTM | RCNN | HierAtteNet|Seq2seqAttn|EntityNet|DynamicMemory|Transformer
+Models   | fastText|TextCNN |BiLSTM | TextRCNN | HierAtteNet|Seq2seqAttn|EntityNet|DynamicMemory|Transformer
 ---      | ---     | ---    |---    |---   |---         |---        |---      |---          |----
 Accuracy |0.834304 |0.774316| 0.884974 |      |            |           |         |             |
 
