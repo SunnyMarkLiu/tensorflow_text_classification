@@ -19,9 +19,8 @@ import tensorflow as tf
 
 class TextRCNN(object):
     def __init__(self, label_size, sequence_length, vocabulary_size, embedding_dim,
-                 latent_hidden_size, fc_hidden_size, batch_size,
+                 latent_hidden_size, batch_size,
                  embedding_trainable=False, l2_reg_lambda=0.0,
-                 dropout_keep_prob=1.0,
                  initializer=tf.random_normal_initializer(stddev=0.1)
                  ):
         # set hyperparamter
@@ -32,22 +31,22 @@ class TextRCNN(object):
         self.embedding_trainable = embedding_trainable
 
         # transform to latent semantic vector
-        self.latent_hidden_size = latent_hidden_size
-        self.fc_hidden_size = fc_hidden_size
+        self.latent_hidden_size = latent_hidden_size * 3
 
         self.batch_size = batch_size
         self.activation = tf.nn.tanh
 
         self.l2_reg_lambda = l2_reg_lambda
-        self.dropout_keep_prob = dropout_keep_prob
         self.initializer = initializer
 
         # Placeholders for input, output
         self.sentence = tf.placeholder(tf.int32, shape=[None, self.sequence_length], name='input_x')
         self.labels = tf.placeholder(tf.int8, shape=[None, self.label_size], name='input_y')
         self.learning_rate = tf.placeholder(tf.float32, name='learning_rate')
+        self.dropout_keep_prob = tf.placeholder(tf.float32, name='dropout_keep_prob')
 
         # instantiate weights
+        self.instantiate_weights()
 
         # build bilstm model architecture
         self.build_model()
@@ -77,11 +76,11 @@ class TextRCNN(object):
             self.W_sr = tf.get_variable("W_sr", shape=[self.embedding_dim, self.embedding_dim], initializer=self.initializer)
 
             # y(i_2) layer weights, generate latent semantic vector
-            self.latent_W = tf.get_variable("latent_W",shape=[self.fc_hidden_size * 3, self.latent_hidden_size],initializer=self.initializer)
+            self.latent_W = tf.get_variable("latent_W",shape=[self.embedding_dim * 3, self.latent_hidden_size],initializer=self.initializer)
             self.latent_b = tf.get_variable("latent_b", shape=[self.embedding_dim])
 
             # fc layer
-            self.fc_W = tf.get_variable("fc_W",shape=[self.embedding_dim * 3, self.label_size],initializer=self.initializer)
+            self.fc_W = tf.get_variable("fc_W",shape=[self.latent_hidden_size, self.label_size],initializer=self.initializer)
             self.fc_b = tf.get_variable("fc_b", shape=[self.label_size])
 
 
@@ -104,6 +103,7 @@ class TextRCNN(object):
         with tf.name_scope('max_pooling_layer'):
             max_pooling_out = tf.reduce_max(conv_recurrent_out, axis=1)
 
+        print('---> max_pooling_out', max_pooling_out)
         # 4. FC layer
         with tf.name_scope('readout'):
             h_dropout = tf.nn.dropout(max_pooling_out, keep_prob=self.dropout_keep_prob)
@@ -170,7 +170,7 @@ class TextRCNN(object):
             output_representations_list.append(word_representation)
 
         # 5. stack list to a tensor
-        # [None,sentence_length, latent_hidden_size]
+        # [None, sentence_length, latent_hidden_size]
         conv_recurrent_output = tf.stack(output_representations_list, axis=1)
         return conv_recurrent_output
 
