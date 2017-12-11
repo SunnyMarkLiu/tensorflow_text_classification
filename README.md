@@ -45,9 +45,9 @@ l2_reg_lambda = 1e-3
 embedding_trainable = False
 ```
 
-Models   | fastText|TextCNN |BiLSTM | TextRCNN | HierAtteNet|Seq2seqAttn|EntityNet|DynamicMemory|Transformer
----      | ---     | ---    |---    |---   |---         |---        |---      |---          |----
-Accuracy |0.834304 |0.774316| 0.884974 |      |            |           |         |             |
+Models   | fastText|TextCNN |BiLSTM    | TextRCNN | HierAtteNet|Seq2seqAttn|EntityNet|DynamicMemory|Transformer
+---      | ---     | ---    |---       |---       |---         |---        |---      |---          |----
+Accuracy |0.834304 |0.774316| 0.884974 |0.840128  |            |           |         |             |
 
 ## References
 - [Understanding Convolutional Neural Networks for NLP](http://www.wildml.com/2015/11/understanding-convolutional-neural-networks-for-nlp/)

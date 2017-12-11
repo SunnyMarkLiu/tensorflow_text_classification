@@ -46,8 +46,8 @@ tf.flags.DEFINE_float('dropout_keep_prob', 0.6, "Dropout keep probability (defau
 tf.flags.DEFINE_float('latent_hidden_size', 300, "Hidden size of Weights to transform latent semantic vector (default: 300)")
 
 # Training parameters
-tf.flags.DEFINE_integer("max_learning_rate", 0.001, "Max learning_rate when start training (default: 0.01)")
-tf.flags.DEFINE_float('batch_size', 64, "Train batch size (default: 64)")
+tf.flags.DEFINE_integer("max_learning_rate", 0.01, "Max learning_rate when start training (default: 0.01)")
+tf.flags.DEFINE_float('batch_size', 32, "Train batch size (default: 64)")
 tf.flags.DEFINE_integer("epochs", 10, "Number of training epochs (default: 200)")
 tf.flags.DEFINE_integer("train_verbose_every_steps", 10, "Show the training info every steps (default: 100)")
 tf.flags.DEFINE_integer("evaluate_every_steps", 100, "Evaluate model on dev set after this many steps (default: 100)")

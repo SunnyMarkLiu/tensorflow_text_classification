@@ -106,7 +106,7 @@ class TextRCNN(object):
         # 4. FC layer
         with tf.name_scope('readout'):
             h_dropout = tf.nn.dropout(max_pooling_out, keep_prob=self.dropout_keep_prob)
-            self.logits = tf.add(tf.matmul(h_dropout, self.fc_W), self.fc_b)
+            self.logits = tf.add(tf.matmul(h_dropout, self.fc_W), self.fc_b, name='logits')
 
         with tf.name_scope("loss"):
             l2_losses = tf.add_n([tf.nn.l2_loss(v) for v in tf.trainable_variables()])
