@@ -15,6 +15,7 @@ sys.path.append(module_path)
 
 import math
 import time
+import h5py
 import numpy as np
 import tensorflow as tf
 from tensorflow.contrib import learn
@@ -166,7 +167,7 @@ with tf.Graph().as_default(), tf.device('/gpu:2'):
                 grad_summaries.append(grad_sparsity_summary)
         grad_summaries_merged = tf.summary.merge(grad_summaries)
 
-        # Output directory for models and summaries
+        # Output directory for models and summaries, default timestamp
         out_dir = os.path.abspath(os.path.join(os.path.curdir, "run", FLAGS.log_message))
         print("---> write logs and summaries to {}".format(out_dir))
 
@@ -261,7 +262,8 @@ with tf.Graph().as_default(), tf.device('/gpu:2'):
 
                 batch_x, batch_y = train_data_wrapper.next_batch(FLAGS.batch_size)
 
-                train_step(batch_x, batch_y, learning_rate, FLAGS.dropout_keep_prob)
+                if batch_x.shape[0] == FLAGS.batch_size:
+                    train_step(batch_x, batch_y, learning_rate, FLAGS.dropout_keep_prob)
                 current_step = tf.train.global_step(session, global_step)
 
                 if current_step % FLAGS.evaluate_every_steps == 0:
@@ -270,9 +272,10 @@ with tf.Graph().as_default(), tf.device('/gpu:2'):
                     losses = []; accuracies = []
                     for _ in range(valid_data_wrapper.x.shape[0] // FLAGS.batch_size + 1):
                         val_x, val_y = valid_data_wrapper.next_batch(FLAGS.batch_size)
-                        loss, accuracy = valid_step(val_x, val_y, valid_summary_writer)
-                        losses.append(loss)
-                        accuracies.append(accuracy)
+                        if val_x.shape[0] == FLAGS.batch_size:
+                            loss, accuracy = valid_step(val_x, val_y, valid_summary_writer)
+                            losses.append(loss)
+                            accuracies.append(accuracy)
 
                     time_str = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
                     print("valid {}: step: {:d}, loss {:g}, acc {:g}".format(time_str, current_step, np.mean(losses),
@@ -301,8 +304,9 @@ with tf.Graph().as_default(), tf.device('/gpu:2'):
         accuracies = []
         for j in range(test_data_wrapper.x.shape[0] // FLAGS.batch_size + 1):
             test_x, test_y = valid_data_wrapper.next_batch(FLAGS.batch_size)
-            accuracy = test_step(test_x, test_y)
-            accuracies.append(accuracy * test_x.shape[0])
+            if test_x.shape[0] == FLAGS.batch_size:
+                accuracy = test_step(test_x, test_y)
+                accuracies.append(accuracy * test_x.shape[0])
 
         accuracy = 1.0 * np.sum(accuracies) / test_data_wrapper.x.shape[0]
         print('test accuracy : {:g}'.format(accuracy))

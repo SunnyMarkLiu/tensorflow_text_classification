@@ -18,9 +18,8 @@ import tensorflow as tf
 
 
 class TextRCNN(object):
-    def __init__(self, label_size, sequence_length, vocabulary_size, embedding_dim,
-                 latent_hidden_size, batch_size,
-                 embedding_trainable=False, l2_reg_lambda=0.0,
+    def __init__(self, label_size, sequence_length, vocabulary_size, embedding_dim, batch_size,
+                 latent_hidden_size, embedding_trainable=False, l2_reg_lambda=0.0,
                  initializer=tf.random_normal_initializer(stddev=0.1)
                  ):
         # set hyperparamter
