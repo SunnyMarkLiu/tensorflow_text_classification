@@ -16,23 +16,28 @@ In this task, given a movie review, the model attempts to predict whether it is 
 ### Models
 #### 1. FastText
 ![](./imgs/fast_text_model.png)
-- word representations: [Enriching Word Vectors with Subword Information](https://arxiv.org/abs/1607.04606)
-- text classification: [Bag of Tricks for Efficient Text Classification](https://arxiv.org/abs/1607.01759)
+- text classification: [Bag of Tricks for Efficient Text Classification, 2016.07](https://arxiv.org/abs/1607.01759)
 
 #### 2. TextCNN
 ![](./imgs/text_cnn_model.png)
 ![](./imgs/text_cnn_model_explain.png)
-- [Convolutional Neural Networks for Sentence Classification](https://arxiv.org/abs/1408.5882)
+- [Convolutional Neural Networks for Sentence Classification, 2014.08](https://arxiv.org/abs/1408.5882)
 - [A Sensitivity Analysis of (and Practitioners' Guide to) Convolutional Neural Networks for Sentence Classification](https://arxiv.org/abs/1510.03820)
 
 #### 3. BiLSTM
 ![](./imgs/bilstm_model.png)
-- [Bidirectional Recurrent Neural Networks](http://ieeexplore.ieee.org/document/650093/)
+- [Bidirectional Recurrent Neural Networks, 1997](http://ieeexplore.ieee.org/document/650093/)
 
 #### 4. TextRCNN
 ![](./imgs/rcnn_model.png)
 Learn more contextual information   than conventional window-based neural networks.
-- [Recurrent Convolutional Neural Networks for Text Classification](https://scholar.google.com.hk/scholar?q=Recurrent+Convolutional+Neural+Networks+for+Text+Classification&hl=zh-CN&as_sdt=0&as_vis=1&oi=scholart&sa=X&ved=0ahUKEwjpx82cvqTUAhWHspQKHUbDBDYQgQMIITAA)
+- [Recurrent Convolutional Neural Networks for Text Classification, 2015](https://scholar.google.com.hk/scholar?q=Recurrent+Convolutional+Neural+Networks+for+Text+Classification&hl=zh-CN&as_sdt=0&as_vis=1&oi=scholart&sa=X&ved=0ahUKEwjpx82cvqTUAhWHspQKHUbDBDYQgQMIITAA)
+
+#### 5. Hierarchical Attention Networks
+- [Hierarchical Attention Networks for Document Classification, 2016](http://www.cs.cmu.edu/~./hovy/papers/16HLT-hierarchical-attention-networks.pdf)
+
+#### 6. Multilingual Hierarchical Attention Networks
+- [Multilingual Hierarchical Attention Networks for Document Classification, 2017.07](https://arxiv.org/abs/1707.00896)
 
 ## Performance
 ```
