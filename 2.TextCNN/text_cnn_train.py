@@ -15,6 +15,7 @@ import time
 module_path = os.path.abspath(os.path.join('..'))
 sys.path.append(module_path)
 
+import h5py
 import numpy as np
 import tensorflow as tf
 from tensorflow.contrib import learn
@@ -80,7 +81,7 @@ print('---> build vocabulary according this text dataset')
 document_len = np.array([len(x.split(" ")) for x in x_text])
 print('document_length, max = {}, mean = {}, min = {}'.format(document_len.max(), document_len.mean(),
                                                               document_len.min()))
-max_document_length = FLAGS.max_document_length
+max_document_length = 200
 vocab_processor = learn.preprocessing.VocabularyProcessor(max_document_length=max_document_length)
 # Maps documents to sequences of word ids in vocabulary
 x = np.array(list(vocab_processor.fit_transform(x_text)))
@@ -88,14 +89,37 @@ x = np.array(list(vocab_processor.fit_transform(x_text)))
 vocabulary_size = len(vocab_processor.vocabulary_)
 print('built vocabulary size: {:d}'.format(vocabulary_size))
 
-print('---> Split train/validate/test set')
-test_sample_index = -1 * int(FLAGS.test_split_percentage * float(len(y)))
-x_train, x_test = x[:test_sample_index], x[test_sample_index:]
-y_train, y_test = y[:test_sample_index], y[test_sample_index:]
+if not os.path.exists(Configure.dataset_path):
+    # Randomly shuffle data
+    np.random.seed(10)
+    shuffle_indices = np.random.permutation(np.arange(len(y)))
+    x = x[shuffle_indices]
+    y = y[shuffle_indices]
 
-valid_sample_index = -1 * int(FLAGS.validate_split_percentage * float(len(x_train)))
-x_train, x_valid = x_train[:valid_sample_index], x_train[valid_sample_index:]
-y_train, y_valid = y_train[:valid_sample_index], y_train[valid_sample_index:]
+    print('---> Split train/validate/test set')
+    test_sample_index = -1 * int(FLAGS.test_split_percentage * float(len(y)))
+    x_train, x_test = x[:test_sample_index], x[test_sample_index:]
+    y_train, y_test = y[:test_sample_index], y[test_sample_index:]
+
+    valid_sample_index = -1 * int(FLAGS.validate_split_percentage * float(len(x_train)))
+    x_train, x_valid = x_train[:valid_sample_index], x_train[valid_sample_index:]
+    y_train, y_valid = y_train[:valid_sample_index], y_train[valid_sample_index:]
+
+    f = h5py.File(Configure.dataset_path, 'w')
+    f['x_train'] = x_train; f['y_train'] = y_train
+    f['x_test'] = x_test; f['y_test'] = y_test
+    f['x_valid'] = x_valid; f['y_valid'] = y_valid
+    f.flush()
+    f.close()
+else:
+    f = h5py.File(Configure.dataset_path, 'r')
+    x_train = f['x_train'][:]
+    y_train = f['y_train'][:]
+    x_test = f['x_test'][:]
+    y_test = f['y_test'][:]
+    x_valid = f['x_valid'][:]
+    y_valid = f['y_valid'][:]
+    f.close()
 
 print("train/valid/test split: {:d}/{:d}/{:d}".format(len(y_train), len(y_valid), len(y_test)))
 print('---> create train/valid data wapper')
