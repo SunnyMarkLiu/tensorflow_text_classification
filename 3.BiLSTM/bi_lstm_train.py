@@ -41,9 +41,7 @@ tf.flags.DEFINE_float('validate_split_percentage', 0.1, 'Percentage of the train
 tf.flags.DEFINE_integer('embedding_dim', 300, 'Dimensionality of word embedding (default: 300)')
 tf.flags.DEFINE_integer('max_document_length', 200, 'Max document length (default: 200)')
 tf.flags.DEFINE_bool('lstm_drop_out', False, "Use dropout with LSTM (default: False)")
-tf.flags.DEFINE_float('lstm_input_keep_prob', 1.0, "Dropout keep probability about LSTM input(default: 1.0)")
-tf.flags.DEFINE_float('lstm_output_keep_prob', 1.0, "Dropout keep probability about LSTM output(default: 1.0)")
-tf.flags.DEFINE_float('lstm_state_keep_prob', 1.0, "Dropout keep probability about LSTM state(default: 1.0)")
+tf.flags.DEFINE_float('dropout_keep_prob', 1.0, "Dropout keep probability about LSTM cell(default: 1.0)")
 
 tf.flags.DEFINE_bool('embedding_trainable', False, 'Word embedding trainable (default: False)')
 
@@ -212,12 +210,13 @@ with tf.Graph().as_default(), tf.device('/gpu:1'):
         print('---> assign model embedding matrix')
         session.run(tf.assign(ref=bilstm.embedding_matrix, value=word_embeddings))
 
-        def train_step(x_batch, y_batch, learning_rate_):
+        def train_step(x_batch, y_batch, learning_rate_, dropout_keep_prob):
             """ training step """
             feed_dict = {
                 bilstm.sentence: x_batch,
                 bilstm.labels: y_batch,
-                bilstm.learning_rate: learning_rate_
+                bilstm.learning_rate: learning_rate_,
+                bilstm.dropout_keep_prob: dropout_keep_prob
             }
             _, step, summaries, loss_, accuracy_ = session.run([train_op, global_step, train_summary_op,
                                                                 bilstm.loss, bilstm.accuracy],
@@ -234,7 +233,8 @@ with tf.Graph().as_default(), tf.device('/gpu:1'):
             """ validate step """
             feed_dict = {
                 bilstm.sentence: x_batch,
-                bilstm.labels: y_batch
+                bilstm.labels: y_batch,
+                bilstm.dropout_keep_prob: 1.0
             }
             summaries, loss_, accuracy_ = session.run([valid_summary_op,
                                                        bilstm.loss, bilstm.accuracy],
@@ -262,7 +262,7 @@ with tf.Graph().as_default(), tf.device('/gpu:1'):
 
                 batch_x, batch_y = train_data_wrapper.next_batch(FLAGS.batch_size)
 
-                train_step(batch_x, batch_y, learning_rate)
+                train_step(batch_x, batch_y, learning_rate, FLAGS.dropout_keep_prob)
                 current_step = tf.train.global_step(session, global_step)
 
                 if current_step % FLAGS.evaluate_every_steps == 0:
@@ -294,7 +294,8 @@ with tf.Graph().as_default(), tf.device('/gpu:1'):
             """ test step """
             feed_dict = {
                 bilstm.sentence: x_batch,
-                bilstm.labels: y_batch
+                bilstm.labels: y_batch,
+                bilstm.dropout_keep_prob: 1.0
             }
             accuracy_ = session.run(bilstm.accuracy, feed_dict=feed_dict)
             return accuracy_

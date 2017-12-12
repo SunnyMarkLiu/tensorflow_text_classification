@@ -20,8 +20,7 @@ from tensorflow.contrib import rnn
 class BiLSTM(object):
     def __init__(self, label_size, sequence_length, vocabulary_size, embedding_dim,
                  hidden_size, embedding_trainable=False, l2_reg_lambda=0.0,
-                 lstm_drop_out=False, input_keep_prob=1.0,
-                 output_keep_prob=1.0, state_keep_prob=1.0):
+                 lstm_drop_out=False):
         # set hyperparamter
         self.label_size = label_size
         self.sequence_length = sequence_length
@@ -31,14 +30,12 @@ class BiLSTM(object):
         self.hidden_size = hidden_size
         self.l2_reg_lambda = l2_reg_lambda
         self.lstm_drop_out = lstm_drop_out
-        self.input_keep_prob = input_keep_prob
-        self.output_keep_prob = output_keep_prob
-        self.state_keep_prob = state_keep_prob
 
         # Placeholders for input, output
         self.sentence = tf.placeholder(tf.int32, shape=[None, self.sequence_length], name='input_x')
         self.labels = tf.placeholder(tf.int8, shape=[None, self.label_size], name='input_y')
         self.learning_rate = tf.placeholder(tf.float32, name='learning_rate')
+        self.dropout_keep_prob = tf.placeholder(tf.float32, name='dropout_keep_prob')
 
         # build bilstm model architecture
         self.build_model()
@@ -65,13 +62,9 @@ class BiLSTM(object):
 
             if self.lstm_drop_out:
                 lstm_fw_cell = rnn.DropoutWrapper(cell=lstm_fw_cell,
-                                                  input_keep_prob=self.input_keep_prob,
-                                                  output_keep_prob=self.output_keep_prob,
-                                                  state_keep_prob=self.state_keep_prob)
+                                                  output_keep_prob=self.dropout_keep_prob)
                 lstm_bw_cell = rnn.DropoutWrapper(cell=lstm_bw_cell,
-                                                  input_keep_prob=self.input_keep_prob,
-                                                  output_keep_prob=self.output_keep_prob,
-                                                  state_keep_prob=self.state_keep_prob)
+                                                  output_keep_prob=self.dropout_keep_prob)
             '''
             bidirectional_dynamic_rnn: input:  [batch_size, sequence_length, embedding_dim], max_time == sequence_length
                                        output: A tuple (outputs, output_states)
