@@ -16,7 +16,7 @@ In this task, given a movie review, the model attempts to predict whether it is 
 ### Models
 #### 1. FastText
 <div align=center>
-<img src='imgs/fast_text_model.png'>
+<img src='imgs/fast_text_model.png' width='400' height='200'>
 </div>
 
 - text classification: [Bag of Tricks for Efficient Text Classification, 2016.07](https://arxiv.org/abs/1607.01759)
@@ -34,7 +34,10 @@ In this task, given a movie review, the model attempts to predict whether it is 
 - [A Sensitivity Analysis of (and Practitioners' Guide to) Convolutional Neural Networks for Sentence Classification](https://arxiv.org/abs/1510.03820)
 
 #### 3. BiLSTM
-![](./imgs/bilstm_model.png)
+<div align=center>
+<img src='imgs/bilstm_model.png' width='600' height='300'>
+</div>
+
 - [Bidirectional Recurrent Neural Networks, 1997](http://ieeexplore.ieee.org/document/650093/)
 
 #### 4. TextRCNN
@@ -65,7 +68,7 @@ embedding_trainable = False
 
 Models   | fastText|TextCNN |BiLSTM    | TextRCNN | HierAtteNet|Seq2seqAttn|EntityNet|DynamicMemory|Transformer
 ---      | ---     | ---    |---       |---       |---         |---        |---      |---          |----
-Accuracy |0.834304 |0.878276| 0.884974 |0.840128  |0.881771    |           |         |             |
+Accuracy |0.834304 |0.878276| 0.884974 |0.840128  |0.891314    |           |         |             |
 
 ## References
 - [Understanding Convolutional Neural Networks for NLP](http://www.wildml.com/2015/11/understanding-convolutional-neural-networks-for-nlp/)
