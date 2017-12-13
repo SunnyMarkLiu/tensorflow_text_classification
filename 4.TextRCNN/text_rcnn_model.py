@@ -86,7 +86,7 @@ class TextRCNN(object):
     def build_model(self):
         """
         build text rcnn model architecture
-        1. embeddding layer, 2.Bi-LSTM layer, 3.max-pooling, 4.FC layer 5.softmax
+        1. embeddding layer, 2.Conv_recurrent layer, 3.max-pooling, 4.FC layer 5.softmax
         """
         # 1. Embedding layer
         with tf.device('/cpu:0'), tf.name_scope('embedding'):

@@ -43,10 +43,10 @@ tf.flags.DEFINE_integer('embedding_dim', 300, 'Dimensionality of word embedding 
 tf.flags.DEFINE_bool('embedding_trainable', False, 'Word embedding trainable (default: False)')
 tf.flags.DEFINE_integer('max_document_length', 200, 'Max document length (default: 200)')
 tf.flags.DEFINE_float('dropout_keep_prob', 0.6, "Dropout keep probability (default: 0.6)")
-tf.flags.DEFINE_float('latent_hidden_size', 900, "Hidden size of Weights to transform latent semantic vector (default: embedding_dim(300) * 3)")
+tf.flags.DEFINE_float('latent_hidden_size', 300, "Hidden size of Weights to transform latent semantic vector (default: embedding_dim(300) * 3)")
 
 # Training parameters
-tf.flags.DEFINE_integer("max_learning_rate", 0.01, "Max learning_rate when start training (default: 0.01)")
+tf.flags.DEFINE_integer("max_learning_rate", 0.001, "Max learning_rate when start training (default: 0.01)")
 tf.flags.DEFINE_float('batch_size', 32, "Train batch size (default: 64)")
 tf.flags.DEFINE_integer("epochs", 10, "Number of training epochs (default: 200)")
 tf.flags.DEFINE_integer("train_verbose_every_steps", 10, "Show the training info every steps (default: 100)")
