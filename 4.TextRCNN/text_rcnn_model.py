@@ -30,7 +30,7 @@ class TextRCNN(object):
         self.embedding_trainable = embedding_trainable
 
         # transform to latent semantic vector
-        self.latent_hidden_size = latent_hidden_size * 3
+        self.latent_hidden_size = latent_hidden_size
 
         self.batch_size = batch_size
         self.activation = tf.nn.tanh
@@ -76,7 +76,7 @@ class TextRCNN(object):
 
             # y(i_2) layer weights, generate latent semantic vector
             self.latent_W = tf.get_variable("latent_W",shape=[self.embedding_dim * 3, self.latent_hidden_size],initializer=self.initializer)
-            self.latent_b = tf.get_variable("latent_b", shape=[self.embedding_dim])
+            self.latent_b = tf.get_variable("latent_b", shape=[self.latent_hidden_size])
 
             # fc layer
             self.fc_W = tf.get_variable("fc_W",shape=[self.latent_hidden_size, self.label_size],initializer=self.initializer)
@@ -164,8 +164,8 @@ class TextRCNN(object):
                                             current_embedding_word,
                                             context_right_list[index]], axis=1)
 
-            # trainform latent semantic vector # TODO
-            # ...
+            # trainform latent semantic vector
+            word_representation = self.activation(tf.add(tf.matmul(word_representation, self.latent_W), self.latent_b))
             output_representations_list.append(word_representation)
 
         # 5. stack list to a tensor
