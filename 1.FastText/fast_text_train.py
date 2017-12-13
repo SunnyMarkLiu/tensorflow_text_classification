@@ -42,7 +42,7 @@ tf.flags.DEFINE_integer('embedding_dim', 300, 'Dimensionality of word embedding 
 tf.flags.DEFINE_float('dropout_keep_prob', 0.5, "Dropout keep probability (default: 0.5)")
 
 # Training parameters
-tf.flags.DEFINE_integer("max_learning_rate", 0.01, "Max learning_rate when start training (default: 0.01)")
+tf.flags.DEFINE_float("max_learning_rate", 0.01, "Max learning_rate when start training (default: 0.01)")
 tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
 tf.flags.DEFINE_integer("epochs", 10, "Number of training epochs (default: 200)")
 tf.flags.DEFINE_integer("train_verbose_every_steps", 50, "Show the training info every steps (default: 100)")
@@ -50,7 +50,7 @@ tf.flags.DEFINE_integer("evaluate_every_steps", 100, "Evaluate model on dev set 
 tf.flags.DEFINE_integer("checkpoint_every_steps", 1000, "Save model after this many steps (default: 100)")
 tf.flags.DEFINE_integer("max_num_checkpoints_to_keep", 5, "Number of checkpoints to store (default: 5)")
 tf.flags.DEFINE_float("decay_rate", 0.8, "Learning rate decay rate (default: 0.9)")
-tf.flags.DEFINE_float("decay_steps", 2000, "Perform learning rate decay step (default: 10000)")
+tf.flags.DEFINE_integer("decay_steps", 2000, "Perform learning rate decay step (default: 10000)")
 tf.flags.DEFINE_float("l2_reg_lambda", 1e-4, "L2 regulaization rate (default: 10000)")
 
 FLAGS = tf.flags.FLAGS
