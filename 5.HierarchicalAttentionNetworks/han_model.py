@@ -45,7 +45,6 @@ class HierarchicalAttentionNetworks(object):
         self.word_attention_size = word_attention_size
         self.sent_attention_size = sent_attention_size
 
-
         # the length of every sentences in document
         self.sentence_length = int(self.sequence_length / self.num_sentences)
         self.word_encoder_bigru_num_units = word_encoder_bigru_num_units
@@ -82,6 +81,7 @@ class HierarchicalAttentionNetworks(object):
             input_x = tf.split(self.inputs, self.num_sentences, axis=1) # list, each element: [batch_size, sentence_length]
             input_x = tf.stack(input_x, axis=1) # [batch_size, num_sentences, sentence_length], every document represented as [num_sentences, sentence_length]
             print('every document represented as: ', input_x.get_shape().as_list())
+
             self.embedded_words = tf.nn.embedding_lookup(self.embedding_matrix, input_x) # [batch_size, num_sentences, sentence_length, embedding_dim]
             print('every document embedded as: ', self.embedded_words.get_shape().as_list())
 
