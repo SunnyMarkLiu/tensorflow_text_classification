@@ -15,12 +15,21 @@ In this task, given a movie review, the model attempts to predict whether it is 
 
 ### Models
 #### 1. FastText
-![](./imgs/fast_text_model.png)
+<div align=center>
+<img src='imgs/fast_text_model.png'>
+</div>
+
 - text classification: [Bag of Tricks for Efficient Text Classification, 2016.07](https://arxiv.org/abs/1607.01759)
 
 #### 2. TextCNN
-![](./imgs/text_cnn_model.png)
-![](./imgs/text_cnn_model_explain.png)
+<div align=center>
+<img src='imgs/text_cnn_model.png' width='700' height='300'>
+</div>
+
+<div align=center>
+<img src='imgs/text_cnn_model_explain.png' width='600' height='500'>
+</div>
+
 - [Convolutional Neural Networks for Sentence Classification, 2014.08](https://arxiv.org/abs/1408.5882)
 - [A Sensitivity Analysis of (and Practitioners' Guide to) Convolutional Neural Networks for Sentence Classification](https://arxiv.org/abs/1510.03820)
 
@@ -35,8 +44,9 @@ Learn more contextual information   than conventional window-based neural networ
 
 #### 5. Hierarchical Attention Networks
 <div align=center>
-    <img width="150" height="150" src="https://github.com/SunnyMarkLiu/tensorflow_text_classification/blob/master/imgs/han_model.png"/>
+<img src='imgs/han_model.png' width='500' height='500'>
 </div>
+
 - [Hierarchical Attention Networks for Document Classification, 2016](http://www.cs.cmu.edu/~./hovy/papers/16HLT-hierarchical-attention-networks.pdf)
 
 #### 6. Multilingual Hierarchical Attention Networks
