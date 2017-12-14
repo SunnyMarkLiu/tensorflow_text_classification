@@ -19,9 +19,10 @@ import tensorflow.contrib.layers as layers
 
 class HierarchicalAttentionNetworks(object):
     def __init__(self, label_size, num_sentences, sequence_length, vocabulary_size,
-                 embedding_dim, word_encoder_bigru_num_units, batch_size,
-                 word_attention_size, sent_attention_size, embedding_trainable=False,
+                 embedding_dim, word_encoder_bigru_num_units,
+                 word_attention_size, sent_attention_size,
                  l2_reg_lambda=1e-4, activation=tf.nn.relu,
+                 embedding_trainable=False
                  ):
         """
         :param label_size: 
@@ -41,7 +42,6 @@ class HierarchicalAttentionNetworks(object):
         self.l2_reg_lambda = l2_reg_lambda
         self.activation = activation
 
-        self.batch_size = batch_size
         self.word_attention_size = word_attention_size
         self.sent_attention_size = sent_attention_size
 
@@ -51,12 +51,8 @@ class HierarchicalAttentionNetworks(object):
 
         # Placeholders for input, output
         # document represented as: [num_sentences, sentence_length]
-        self.inputs = tf.placeholder(tf.int32, shape=[self.batch_size, self.sequence_length], name='input_x')
-        self.labels = tf.placeholder(tf.int8, shape=[self.batch_size, self.label_size], name='input_y')
-        self.total_batch_num_sentences = tf.placeholder(shape=(self.batch_size, self.num_sentences),
-                                                        dtype=tf.int64, name='sentence_lengths')
-        # batch input documents
-        self.document_lengths = tf.placeholder(shape=self.batch_size, dtype=tf.int64, name='document_lengths')
+        self.inputs = tf.placeholder(tf.int32, shape=[None, self.sequence_length], name='input_x')
+        self.labels = tf.placeholder(tf.int8, shape=[None, self.label_size], name='input_y')
 
         self.learning_rate = tf.placeholder(tf.float32, name='learning_rate')
 
@@ -88,12 +84,12 @@ class HierarchicalAttentionNetworks(object):
             self.embedded_words = tf.nn.embedding_lookup(self.embedding_matrix, input_x) # [batch_size, num_sentences, sentence_length, embedding_dim]
             print('every document embedded as: ', self.embedded_words.get_shape().as_list())
 
-            batch_num_sentences_length = tf.reshape(self.total_batch_num_sentences, [-1])  # [batch_size * num_sentences]
-            embedded_words_reshaped = tf.reshape(self.embedded_words, [self.batch_size * self.num_sentences, self.sentence_length, self.embedding_dim])
+            # batch_num_sentences_length = tf.reshape(self.total_batch_num_sentences, [-1])  # [batch_size * num_sentences]
+            embedded_words_reshaped = tf.reshape(self.embedded_words, [-1, self.sentence_length, self.embedding_dim])
             print('word cell input: ', embedded_words_reshaped.get_shape().as_list())
 
         with tf.variable_scope('word_encoder') as scope:
-            word_encoded_outputs, _ = self.bi_gru_encode(embedded_words_reshaped, batch_num_sentences_length, scope)
+            word_encoded_outputs, _ = self.bi_gru_encode(embedded_words_reshaped, scope)
             print('bi-gru encode: ', word_encoded_outputs.get_shape().as_list())
 
             # word level attention
@@ -101,31 +97,23 @@ class HierarchicalAttentionNetworks(object):
                 sentences_represented = self.attention(word_encoded_outputs, self.word_attention_size, scope1)
                 # each sentence encoded size is word_encoder_bigru_num_units, according to bi-gru encoder
                 sentences_represented = tf.reshape(sentences_represented,
-                                                   shape=[self.batch_size, self.num_sentences, 2 * self.word_encoder_bigru_num_units])
+                                                   shape=[-1, self.num_sentences, 2 * self.word_encoder_bigru_num_units])
                 print('sentences_represented: ', sentences_represented.get_shape().as_list())
 
 
 
 
-    def bi_gru_encode(self, inputs, sentence_size, scope):
+    def bi_gru_encode(self, inputs, scope):
         """
         bi-gru encode words in sentence
         """
-        batch_size = inputs.get_shape()[0]
-
         with tf.variable_scope(scope or 'bi_gru_encode'):
             cell_fw = tf.nn.rnn_cell.GRUCell(num_units=self.word_encoder_bigru_num_units)
             cell_bw = tf.nn.rnn_cell.GRUCell(num_units=self.word_encoder_bigru_num_units)
 
-            initial_state_fw = cell_fw.zero_state(batch_size, tf.float32)
-            initial_state_bw = cell_bw.zero_state(batch_size, tf.float32)
-
             (encode_outs, encode_states) = tf.nn.bidirectional_dynamic_rnn(cell_fw=cell_fw,
                                                                            cell_bw=cell_bw,
                                                                            inputs=inputs,
-                                                                           sequence_length=sentence_size,
-                                                                           initial_state_fw=initial_state_fw,
-                                                                           initial_state_bw=initial_state_bw,
                                                                            dtype=tf.float32)
             concated_encode_outs = tf.concat(encode_outs, axis=2)
             concated_encode_states = tf.concat(encode_states, axis=1)

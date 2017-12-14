@@ -37,7 +37,6 @@ with tf.Graph().as_default(), tf.device('/gpu:1'):
     session = tf.Session(config=session_conf)
     with session.as_default():
         han_model = HierarchicalAttentionNetworks(
-            batch_size=64,
             label_size=2,
             num_sentences=10,
             sequence_length=400,
