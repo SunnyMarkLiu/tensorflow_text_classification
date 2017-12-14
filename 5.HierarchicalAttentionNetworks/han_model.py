@@ -45,6 +45,7 @@ class HierarchicalAttentionNetworks(object):
         self.word_attention_size = word_attention_size
         self.sent_attention_size = sent_attention_size
 
+
         # the length of every sentences in document
         self.sentence_length = int(self.sequence_length / self.num_sentences)
         self.word_encoder_bigru_num_units = word_encoder_bigru_num_units
@@ -53,12 +54,12 @@ class HierarchicalAttentionNetworks(object):
         # document represented as: [num_sentences, sentence_length]
         self.inputs = tf.placeholder(tf.int32, shape=[None, self.sequence_length], name='input_x')
         self.labels = tf.placeholder(tf.int8, shape=[None, self.label_size], name='input_y')
+        self.dropout_keep_prob = tf.placeholder(tf.float32, name='dropout_keep_prob')
 
         self.learning_rate = tf.placeholder(tf.float32, name='learning_rate')
 
         # build HAN model
         self.build_model()
-
 
     def build_model(self):
         """
@@ -88,20 +89,61 @@ class HierarchicalAttentionNetworks(object):
             embedded_words_reshaped = tf.reshape(self.embedded_words, [-1, self.sentence_length, self.embedding_dim])
             print('word cell input: ', embedded_words_reshaped.get_shape().as_list())
 
-        with tf.variable_scope('word_encoder') as scope:
-            word_encoded_outputs, _ = self.bi_gru_encode(embedded_words_reshaped, scope)
-            print('bi-gru encode: ', word_encoded_outputs.get_shape().as_list())
+        print('------ word level encode and attention to get sentence representation ------ ')
+        with tf.variable_scope('word_encoder'):
+            with tf.variable_scope('bigru_encode') as scope:
+                word_encoded_outputs, _ = self.bi_gru_encode(embedded_words_reshaped, scope)
+                print('word bi-gru encode: ', word_encoded_outputs.get_shape().as_list())
 
             # word level attention
-            with tf.variable_scope('attention') as scope1:
-                sentences_represented = self.attention(word_encoded_outputs, self.word_attention_size, scope1)
+            with tf.variable_scope('attention') as scope:
+                sentences_represented = self.attention(word_encoded_outputs, self.word_attention_size, scope)
                 # each sentence encoded size is word_encoder_bigru_num_units, according to bi-gru encoder
                 sentences_represented = tf.reshape(sentences_represented,
                                                    shape=[-1, self.num_sentences, 2 * self.word_encoder_bigru_num_units])
                 print('sentences_represented: ', sentences_represented.get_shape().as_list())
 
+            with tf.variable_scope('dropout'):
+                sentences_represented = layers.dropout(inputs=sentences_represented, keep_prob=self.dropout_keep_prob)
 
+        print('------ sentence level encode and attention to get document representation ------ ')
+        with tf.variable_scope('sentence_encoder'):
+            with tf.variable_scope('bigru_encode') as scope:
+                sentence_encoded_outputs, _ = self.bi_gru_encode(sentences_represented, scope)
+                print('sentence bi-gru encode: ', sentence_encoded_outputs.get_shape().as_list())
 
+            with tf.variable_scope('attention') as scope:
+                document_represented = self.attention(sentence_encoded_outputs, self.sent_attention_size, scope)
+                print('document_represented: ', document_represented.get_shape().as_list())
+
+            with tf.variable_scope('dropout'):
+                document_represented = layers.dropout(inputs=document_represented, keep_prob=self.dropout_keep_prob)
+
+        # full connected layer readout
+        with tf.name_scope('readout'):
+            # 4.linear classifier
+            self.W_projection = tf.get_variable(shape=[self.word_encoder_bigru_num_units * 2, self.label_size],
+                                                initializer=tf.contrib.layers.xavier_initializer(uniform=True),
+                                                name='linear_W_projection')
+            self.b_projection = tf.get_variable(shape=[self.label_size],
+                                                name='linear_b_projection')
+            self.logits = tf.add(tf.matmul(document_represented, self.W_projection), self.b_projection, name='logits')
+            print('readout logits: ', self.logits.get_shape().as_list())
+
+        with tf.name_scope("loss"):
+            l2_loss = tf.constant(0.0)
+            if self.embedding_trainable:
+                l2_loss += tf.nn.l2_loss(self.embedding_matrix)
+
+            l2_loss += tf.add_n([tf.nn.l2_loss(v) for v in tf.trainable_variables() if 'bias' not in v.name])
+
+            losses = tf.nn.softmax_cross_entropy_with_logits(logits=self.logits, labels=self.labels)
+            self.loss = tf.reduce_mean(losses) + self.l2_reg_lambda * l2_loss
+
+        with tf.name_scope("accuracy"):
+            labels = tf.argmax(self.labels, 1)
+            self.predictions = tf.argmax(self.logits, 1, name="predictions")
+            self.accuracy = tf.reduce_mean(tf.cast(tf.equal(self.predictions, labels), "float"), name="accuracy")
 
     def bi_gru_encode(self, inputs, scope):
         """
@@ -136,18 +178,14 @@ class HierarchicalAttentionNetworks(object):
                                                              activation_fn=self.activation,
                                                              weights_regularizer=layers.l2_regularizer(
                                                                  scale=self.l2_reg_lambda))
-            print('hidden_input_represents: ', hidden_input_represents.get_shape().as_list())
 
             # measure the importance of the word as the ** similarity ** of uit with a word level context vector uw
             U_it = self.activation(tf.multiply(hidden_input_represents, word_level_context_vector))
             vector_attn = tf.reduce_sum(U_it, axis=2, keep_dims=True)
-            print('vector_attn: ', vector_attn.get_shape().as_list())
 
             attention_weights = tf.nn.softmax(vector_attn, dim=1)
-            print('attention_weights: ', attention_weights.get_shape().as_list())
 
             weighted_projection = tf.multiply(inputs, attention_weights)
             outputs = tf.reduce_sum(weighted_projection, axis=1)
-            print('attention outputs: ', outputs.get_shape().as_list())
 
             return outputs
