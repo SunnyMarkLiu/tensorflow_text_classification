@@ -34,6 +34,7 @@ Learn more contextual information   than conventional window-based neural networ
 - [Recurrent Convolutional Neural Networks for Text Classification, 2015](https://scholar.google.com.hk/scholar?q=Recurrent+Convolutional+Neural+Networks+for+Text+Classification&hl=zh-CN&as_sdt=0&as_vis=1&oi=scholart&sa=X&ved=0ahUKEwjpx82cvqTUAhWHspQKHUbDBDYQgQMIITAA)
 
 #### 5. Hierarchical Attention Networks
+![](./imgs/han_model.png =100x100)
 - [Hierarchical Attention Networks for Document Classification, 2016](http://www.cs.cmu.edu/~./hovy/papers/16HLT-hierarchical-attention-networks.pdf)
 
 #### 6. Multilingual Hierarchical Attention Networks
@@ -52,7 +53,7 @@ embedding_trainable = False
 
 Models   | fastText|TextCNN |BiLSTM    | TextRCNN | HierAtteNet|Seq2seqAttn|EntityNet|DynamicMemory|Transformer
 ---      | ---     | ---    |---       |---       |---         |---        |---      |---          |----
-Accuracy |0.834304 |0.878276| 0.884974 |0.840128  |            |           |         |             |
+Accuracy |0.834304 |0.878276| 0.884974 |0.840128  |0.881771    |           |         |             |
 
 ## References
 - [Understanding Convolutional Neural Networks for NLP](http://www.wildml.com/2015/11/understanding-convolutional-neural-networks-for-nlp/)
