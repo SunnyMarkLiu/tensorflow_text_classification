@@ -34,7 +34,9 @@ Learn more contextual information   than conventional window-based neural networ
 - [Recurrent Convolutional Neural Networks for Text Classification, 2015](https://scholar.google.com.hk/scholar?q=Recurrent+Convolutional+Neural+Networks+for+Text+Classification&hl=zh-CN&as_sdt=0&as_vis=1&oi=scholart&sa=X&ved=0ahUKEwjpx82cvqTUAhWHspQKHUbDBDYQgQMIITAA)
 
 #### 5. Hierarchical Attention Networks
-![](./imgs/han_model.png =100x100)
+<div align=center>
+    <img width="150" height="150" src="https://github.com/SunnyMarkLiu/tensorflow_text_classification/blob/master/imgs/han_model.png"/>
+</div>
 - [Hierarchical Attention Networks for Document Classification, 2016](http://www.cs.cmu.edu/~./hovy/papers/16HLT-hierarchical-attention-networks.pdf)
 
 #### 6. Multilingual Hierarchical Attention Networks
