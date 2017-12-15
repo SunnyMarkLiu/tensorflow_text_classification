@@ -52,8 +52,8 @@ Learn more contextual information   than conventional window-based neural networ
 
 - [Hierarchical Attention Networks for Document Classification, 2016](http://www.cs.cmu.edu/~./hovy/papers/16HLT-hierarchical-attention-networks.pdf)
 
-#### 6. Multilingual Hierarchical Attention Networks
-- [Multilingual Hierarchical Attention Networks for Document Classification, 2017.07](https://arxiv.org/abs/1707.00896)
+#### 6. Seq2seq with Attention
+- [Neural Machine Translation by Jointly Learning to Align and Translate, 2014.09](https://arxiv.org/abs/1409.0473)
 
 ## Performance
 ```
@@ -68,7 +68,7 @@ embedding_trainable = False
 
 Models   | fastText|TextCNN |BiLSTM    | TextRCNN | HierAtteNet|Seq2seqAttn|EntityNet|DynamicMemory|Transformer
 ---      | ---     | ---    |---       |---       |---         |---        |---      |---          |----
-Accuracy |0.834304 |0.878276| 0.884974 |0.840128  |0.891314    |           |         |             |
+Accuracy |0.834304 |0.878276| 0.884974 |0.840128  |0.889314    |           |         |             |
 
 ## References
 - [Understanding Convolutional Neural Networks for NLP](http://www.wildml.com/2015/11/understanding-convolutional-neural-networks-for-nlp/)
@@ -78,6 +78,7 @@ Accuracy |0.834304 |0.878276| 0.884974 |0.840128  |0.891314    |           |    
 - [自然语言处理中CNN模型几种常见的Max Pooling操作](http://blog.csdn.net/malefactor/article/details/51078135)
 - [LSTM Networks for Sentiment Analysis](http://deeplearning.net/tutorial/lstm.html)
 - [Bag of Tricks for Efficient Text Classification](https://arxiv.org/abs/1607.01759)
+- [Chatbots with Seq2Seq](http://suriyadeepan.github.io/2016-06-28-easy-seq2seq/)
 
 ## License
 This project is licensed under the terms of the MIT license.
